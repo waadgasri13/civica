@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civica Fermi - AI e Comunità</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --accent-cyan: #00f2ff;
+            --accent-violet: #8b5cf6;
+            --text-main: #e0e0e0;
+            --text-dim: #a0a0a0;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --sidebar-width: 280px;
+            --sidebar-collapsed: 80px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; /* Custom cursor will be added via JS */
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Animated Mesh Background */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .mesh-gradient {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 242, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(5, 5, 5, 1) 0%, transparent 100%);
+            filter: blur(80px);
+            animation: meshMove 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes meshMove {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(5%, 5%) rotate(5deg); }
+        }
+
+        /* Custom Cursor */
+        .cursor-follower {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000000; /* Higher than sidebar */
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            height: 100vh !important;
+            width: var(--sidebar-width) !important;
+            background: rgba(10, 10, 10, 0.95) !important;
+            backdrop-filter: blur(25px) !important;
+            -webkit-backdrop-filter: blur(25px) !important;
+            border-right: 2px solid var(--accent-cyan) !important;
+            z-index: 100000 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 40px 0 !important;
+            box-shadow: 15px 0 50px rgba(0, 0, 0, 0.8) !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-cyan) transparent;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--accent-cyan);
+            border-radius: 10px;
+        }
+
+        .sidebar.active {
+            transform: translateX(0) !important;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            color: var(--accent-cyan);
+            text-align: center;
+            opacity: 1;
+            line-height: 1.4;
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+            position: relative;
+            z-index: 100001;
+            flex-shrink: 0;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            width: 100%;
+            position: relative;
+            z-index: 100001;
+            padding: 0 20px 80px 20px;
+        }
+
+        .nav-item {
+            position: relative;
+            text-decoration: none;
+            color: white; /* Brighter color */
+            width: 100%;
+            height: 50px;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 12px;
+        }
+
+        .nav-item:hover {
+            color: var(--accent-cyan);
+            background: rgba(0, 242, 255, 0.1);
+            transform: scale(1.02);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.1);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            font-style: normal;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+        }
+
+        .nav-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-subtitle {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-violet);
+            margin: 30px 0 15px 0;
+            text-align: center;
+            width: 100%;
+            opacity: 0.8;
+            flex-shrink: 0;
+        }
+
+        /* Main Content Area - Strict Alignment */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 0;
+            width: calc(100% - var(--sidebar-width));
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Sections common */
+        section {
+            min-height: 100vh;
+            padding: 100px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Hero Section (Phase 1) */
+        .hero {
+            background: radial-gradient(circle at center, rgba(0, 242, 255, 0.03) 0%, transparent 70%);
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-label {
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            color: var(--accent-cyan);
+            font-size: 0.8rem;
+            margin-bottom: 30px;
+            display: block;
+        }
+
+        .hero-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 4.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            max-width: 700px;
+            margin: 0 auto 60px;
+            line-height: 1.8;
+        }
+
+        /* Scroll Down Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .scroll-indicator:hover { opacity: 1; }
+
+        .mouse {
+            width: 26px;
+            height: 42px;
+            border: 2px solid white;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .mouse::after {
+            content: '';
+            width: 4px;
+            height: 8px;
+            background: white;
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            animation: scrollWheel 2s infinite;
+        }
+
+        @keyframes scrollWheel {
+            0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(15px); }
+        }
+
+        /* Video Showcase (Phase 2) */
+        .video-section {
+            background: rgba(255, 255, 255, 0.01);
+            padding-bottom: 50px;
+            isolation: isolate;
+        }
+
+        /* Canva Presentations Section */
+        .canva-section {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 80px 80px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .canva-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .canva-container {
+            background: var(--bg-deep);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.5s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .canva-container:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 20px 40px rgba(0, 242, 255, 0.1);
+        }
+
+        .canva-embed-wrapper {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-top: 56.25%;
+            padding-bottom: 0;
+            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border-radius: 8px;
+            will-change: transform;
+        }
+
+        .canva-link {
+            display: block;
+            margin-top: 15px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+            text-align: center;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .canva-link:hover {
+            color: var(--accent-cyan);
+        }
+
+        .section-header {
+            margin-bottom: 80px;
+            text-align: center;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .video-container {
+            background: var(--bg-deep);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            position: relative;
+        }
+
+        .video-container:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 20px 40px rgba(0, 242, 255, 0.1);
+        }
+
+        .video-placeholder {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #0a0a0a; /* Sfondo leggermente meno nero */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-placeholder video {
+            position: relative;
+            z-index: 2;
+            opacity: 1 !important;
+            transition: opacity 0.5s ease;
+            background: transparent !important;
+            image-rendering: -webkit-optimize-contrast;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            will-change: transform, opacity;
+        }
+
+        
+
+        .video-container.video-loaded .video-placeholder::before {
+            display: none;
+        }
+
+        .video-container.video-error .video-placeholder::before {
+            content: attr(data-error);
+            color: #ff4444;
+            animation: none;
+        }
+
+        .video-placeholder::before {
+            content: 'CARICAMENTO...';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            color: var(--accent-cyan);
+            z-index: 1;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        .video-caption {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .video-caption h4 {
+            color: white;
+            margin-bottom: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .video-caption p {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+
+        /* Source Repository (Phase 3) */
+        .sources-section {
+            background: #080808;
+            border-top: 1px solid var(--glass-border);
+            min-height: auto;
+            padding: 120px 80px;
+        }
+
+        .sources-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .source-card {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            transition: background 0.3s;
+        }
+
+        .source-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .source-category {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--accent-violet);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .source-card h5 {
+            color: white;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        .source-card p {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        .source-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 1024px) {
+            :root { 
+                --sidebar-width: 250px; 
+            }
+            .canva-grid {
+                grid-template-columns: 1fr;
+            }
+            .sidebar { 
+                padding: 40px 10px; 
+                transform: translateX(-100%);
+                width: var(--sidebar-width) !important;
+            }
+            .sidebar.active {
+                transform: translateX(0) !important;
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .logo { font-size: 0.8rem; margin-bottom: 40px; }
+            .hero-title { font-size: 2.5rem; }
+            .video-grid, .sources-grid { grid-template-columns: 1fr; }
+            section { padding: 60px 20px; }
+            .info-chip {
+                display: none; /* Hide tooltips on mobile */
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-deep);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* Mobile Nav Toggle */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-toggle { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-follower"></div>
+
+    <div id="canvas-container">
+        <div class="mesh-gradient"></div>
+    </div>
+
+    <button class="mobile-toggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
+
+    <nav class="sidebar">
+        <div class="logo">CIVICA<br>FERMI</div>
+        <ul class="nav-links">
+            <li>
+                <a href="./siti/incontro_aggiornato.html" class="nav-item">
+                    <i>📊</i>
+                    <span class="info-chip">Sondaggio: Esplora i dati</span>
+                </a>
+            </li>
+            <li>
+                <a href="./siti/mindfermi.html" class="nav-item">
+                    <i>🧠</i>
+                    <span class="info-chip">MindFermi: AI & Mente</span>
+                </a>
+            </li>
+            <li>
+                <a href="./siti/Energivora - Dati.html" class="nav-item">
+                    <i>⚡</i>
+                    <span class="info-chip">Energivora: Impatto Ambientale</span>
+                </a>
+            </li>
+            <li>
+                <a href="./siti/scheda.html" class="nav-item">
+                    <i>🏋️</i>
+                    <span class="info-chip">Scheda: Esperimento mentale</span>
+                </a>
+            </li>
+            <li>
+                <a href="./siti/ai-medicina.html" class="nav-item">
+                    <i>💉</i>
+                    <span class="info-chip">AI Medicina:Medicina del domani</span>
+                </a>
+            </li>
+                <li>
+                <a href="./siti/ai-diritto.html" class="nav-item">
+                    <i>⚖️</i>
+                    <span class="info-chip">AI Diritto: Dialogo con l'AI</span>
+                </a>
+            </li>
+            <li>
+                <a href="./siti/ai-prof.html" class="nav-item">
+                    <i>👩‍🏫</i>
+                    <span class="info-chip">AI Professore: Insegnamento digitale</span>
+                </a>
+            </li>
+            <li>
+                <a href="./siti/ai-sport.html" class="nav-item">
+                    <i>⚽</i>
+                    <span class="info-chip">AI Sport: Ai digitale</span>
+                </a>
+            </li>
+            <li>
+                <a href="./siti/ai e liberta umana.html" class="nav-item">
+                    <i>👥</i>
+                    <span class="info-chip">AI e Libertà: Un dialogo possibile</span>
+                </a>
+            </li>
+            <div class="sidebar-subtitle">AI e ETICA</div>
+            <li>
+                <a href="./siti/etica.html" class="nav-item">
+                    <i>📜</i>
+                    <span class="info-chip">Etica: Responsabilità</span>
+                </a>
+            </li>
+             <li>
+                <a href="./siti/carreli.html" class="nav-item">
+                    <i>🛤️</i>
+                    <span class="info-chip">Carreli: Dillemma etico</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <!-- Phase 1: Introduction (Hero) -->
+        <section class="hero" id="intro">
+            <div class="hero-content">
+                <span class="hero-label">Classe 5Cs • Progetto Sperimentale</span>
+                <h1 class="hero-title">L'impatto dell'AI nella comunità scolastica</h1>
+                <p class="hero-description">
+                    Benvenuti nel nostro viaggio nell'Intelligenza Artificiale.
+
+                    Siamo la classe 5Cs e questo spazio digitale è il risultato di un percorso di approfondimento collettivo su una delle tecnologie più trasformative del nostro secolo.
+
+                    <br><br>
+
+                    <span style="color: var(--accent-cyan); font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem;">Le nostre radici: Scienza e Coscienza</span><br>
+                    Il filo conduttore che ha guidato i nostri rami di ricerca è stato il saggio <em>"AI e coscienza umana: un dialogo possibile"</em> di Gennaro Monacelli. Questo testo ci ha fornito gli strumenti critici per porci domande fondamentali:
+
+                    <br><br>
+
+                    <span style="display: block; margin: 15px 0; padding-left: 20px; border-left: 2px solid var(--accent-violet);">
+                        Può una macchina arrivare a "sentire"?<br>
+                        Qual è il confine tra calcolo algoritmico e pensiero creativo?<br>
+                        Come cambierà l'essenza dell'essere umano nel confronto con un'entità artificiale?
+                    </span>
+
+                    <br>
+
+                    <span style="color: var(--accent-cyan); font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem;">Esplora il nostro lavoro</span><br>
+                    All'interno di questo sito troverete i diversi percorsi che abbiamo tracciato. Dalle implicazioni etiche alle applicazioni pratiche, ogni sezione rappresenta un tassello del mosaico che abbiamo composto.
+
+                    <br><br>
+
+                    <span style="font-family: 'Space Grotesk', sans-serif; font-style: italic; color: var(--accent-cyan);">— La classe 5Cs, Buona navigazione nel futuro!</span>
+                </p>
+                <div class="scroll-indicator">
+                    <span style="font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Scroll Down</span>
+                    <div class="mouse"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 2: Video Showcase -->
+        <section class="video-section" id="videos">
+            <div class="section-header">
+                <span class="hero-label">Media Gallery</span>
+                <h2 class="section-title">Video Insights</h2>
+            </div>
+            <div class="video-grid">
+                <div class="video-container">
+                    <div style="padding: 15px 25px; border-bottom: 1px solid var(--glass-border); background: rgba(0, 242, 255, 0.05); text-align: center;">
+                        <span class="hero-label" style="margin-bottom: 0; font-size: 0.8rem; letter-spacing: 4px; color: var(--accent-cyan); display: inline-block;">SPOT EVOLUTION</span>
+                    </div>
+                    <div class="video-placeholder">
+                        <video width="100%" height="100%" controls autoplay muted playsinline loop preload="auto" style="width: 100%; height: 100%; object-fit: cover;">
+                            <source src="assets/videos/spot_evolution.mp4" type="video/mp4">
+                            Il tuo browser non supporta il tag video.
+                        </video>
+                    </div>
+                    <div class="video-caption">
+                        <h4>AI e Futuro</h4>
+                        <p>Analisi delle prospettive evolutive dell'intelligenza sintetica nella società moderna.</p>
+                    </div>
+                </div>
+                <div class="video-container second-video">
+                    <div style="padding: 15px 25px; border-bottom: 1px solid var(--glass-border); background: rgba(139, 92, 246, 0.05); text-align: center;">
+                        <span class="hero-label" style="margin-bottom: 0; font-size: 0.8rem; letter-spacing: 4px; color: var(--accent-violet); display: inline-block;">INSEGNAMENTO DIGITALE</span>
+                    </div>
+                    <div class="video-placeholder">
+                        <video width="100%" height="100%" controls autoplay muted playsinline loop preload="auto" style="width: 100%; height: 100%; object-fit: cover;">
+                            <source src="assets/videos/insegnamentodigitale.mp4" type="video/mp4">
+                            Il tuo browser non supporta il tag video.
+                        </video>
+                    </div>
+                    <div class="video-caption">
+                        <h4>AI ed Educazione</h4>
+                        <p>Il ruolo trasformativo delle tecnologie digitali nell'apprendimento e nella didattica.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 2.5: Canva Presentations -->
+        <section class="canva-section" id="presentations">
+            <div class="section-header">
+                <span class="hero-label">Workshop</span>
+                <h2 class="section-title">AI Presentations</h2>
+            </div>
+            <div class="canva-grid">
+                <!-- Prima Presentazione -->
+                <div class="canva-container">
+                    <div class="canva-embed-wrapper">
+                        <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0; margin: 0;" 
+                            src="https://www.canva.com/design/DAHFIDZX6Eg/gDoxMvC-lUOy9oZxbt6RWA/view?embed" 
+                            allowfullscreen="allowfullscreen" allow="fullscreen">
+                        </iframe>
+                    </div>
+                    <a href="https://www.canva.com/design/DAHFIDZX6Eg/gDoxMvC-lUOy9oZxbt6RWA/view?utm_content=DAHFIDZX6Eg&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" 
+                        class="canva-link" target="_blank" rel="noopener">
+                        Inteligenza artificiale per gli studenti• <span style="color: var(--accent-cyan);">Apri in nuova scheda →</span>
+                    </a>
+                </div>
+
+                <!-- Seconda Presentazione -->
+                <div class="canva-container">
+                    <div class="canva-embed-wrapper">
+                        <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0; margin: 0;" 
+                            src="https://www.canva.com/design/DAHKYWBW7ws/pFAe70MRkjCz98HzY-VuHg/watch?embed" 
+                            allowfullscreen="allowfullscreen" allow="fullscreen">
+                        </iframe>
+                    </div>
+                    <a href="https://www.canva.com/design/DAHKYWBW7ws/pFAe70MRkjCz98HzY-VuHg/watch?utm_content=DAHKYWBW7ws&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" 
+                        class="canva-link" target="_blank" rel="noopener">
+                        Presentazione di medicina• <span style="color: var(--accent-cyan);">Apri in nuova scheda →</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 3: Source Repository -->
+        <section class="sources-section" id="sources">
+            <div class="section-header">
+                <span class="hero-label">Bibliography</span>
+                <h2 class="section-title">Sources & Citations</h2>
+            </div>
+            <div class="sources-grid">
+                <div class="source-card">
+                    <span class="source-category">Saggio Principale</span>
+                    <h5>Gennaro Monacelli</h5>
+                    <p>"AI e coscienza umana: un dialogo possibile". Il testo cardine che ha guidato la nostra ricerca etica.</p>
+                    <a href="https://www.instagram.com/p/DQUYon1iJYQ/" class="source-link">Leggi di più →</a>
+                </div>
+                <div class="source-card">
+                    <span class="source-category">Ricerca Scientifica</span>
+                    <h5>LLM Energy Impact</h5>
+                    <p>Studio sull'impronta ecologica e il consumo energetico dei modelli di linguaggio di grandi dimensioni.</p>
+                    <a href="https://nathanbaileyw.medium.com/the-carbon-impact-of-llms-where-are-we-in-2025-6b6551e193ac" class="source-link">Vedi Studio →</a>
+                </div>
+                <div class="source-card">
+                    <span class="source-category">Filosofia Digitale</span>
+                    <h5>Creatività Artificiale</h5>
+                    <p>Esplorazione del confine tra calcolo algoritmico e ispirazione creativa umana.</p>
+                    <a href="https://www.som.polimi.it/highlights/creativita-nellera-dellai-generativa-un-modello-per-comprendere-la-collaborazione-tra-umani-e-intelligenza-artificiale/" class="source-link">Approfondisci →</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <script>
+            (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="j1u7qsgZbn-t3Ue4U0g2F";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+        </script>
+    </footer>
+
+    <script>
+        // Sidebar Auto-Names Logic
+        function initSidebarNames() {
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            navItems.forEach(item => {
+                try {
+                    const infoChip = item.querySelector('.info-chip');
+                    if (!infoChip) return;
+
+                    const fullText = infoChip.textContent || "";
+                    let name = fullText.includes(':') ? fullText.split(':')[0].trim() : fullText.trim();
+                    
+                    if (name.length < 1) name = "Link";
+
+                    const textSpan = document.createElement('span');
+                    textSpan.className = 'nav-text';
+                    textSpan.textContent = name;
+
+                    const icon = item.querySelector('i');
+                    if (icon) {
+                        icon.after(textSpan);
+                    } else {
+                        item.prepend(textSpan);
+                    }
+
+                    // Rimuovi completamente l'elemento info-chip per eliminare i tooltip
+                    infoChip.remove();
+                } catch (error) {
+                    console.error("Errore nel caricamento del nome:", error);
+                }
+            });
+        }
+
+        // Video Loading Logic
+        function initVideoHandlers() {
+            const videoContainers = document.querySelectorAll('.video-container');
+            
+            videoContainers.forEach(container => {
+                const video = container.querySelector('video');
+                if (!video) return;
+
+                // Forza il caricamento e la riproduzione
+                const playVideo = () => {
+                    video.play().catch(e => {
+                        console.warn("Autoplay in attesa di interazione:", e);
+                    });
+                };
+
+                video.load();
+                playVideo();
+
+                // Assicuriamoci che il video non si scurisca o si fermi
+                video.addEventListener('pause', () => {
+                    if (video.loop) playVideo();
+                });
+
+                // Se il video è già pronto o in riproduzione
+                if (video.readyState >= 2) {
+                    container.classList.add('video-loaded');
+                }
+
+                video.addEventListener('canplay', () => {
+                    container.classList.add('video-loaded');
+                    playVideo();
+                });
+
+                video.addEventListener('playing', () => {
+                    container.classList.add('video-loaded');
+                });
+                
+                // Fallback di sicurezza: visibilità garantita
+                setTimeout(() => {
+                    container.classList.add('video-loaded');
+                }, 2000);
+
+                video.addEventListener('error', () => {
+                    console.error("Errore nel caricamento del video:", video.currentSrc);
+                    container.classList.add('video-error');
+                    const placeholder = container.querySelector('.video-placeholder');
+                    if (placeholder) {
+                        placeholder.setAttribute('data-error', 'Errore di caricamento');
+                    }
+                });
+            });
+        }
+
+        // Custom Cursor Logic
+        const cursor = document.querySelector('.cursor-follower');
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.1
+            });
+        });
+
+        // Animations on Load
+        window.addEventListener('load', () => {
+            initSidebarNames(); // Caricamento automatico nomi sidebar
+            initVideoHandlers(); // Gestione caricamento video
+            
+            const tl = gsap.timeline();
+            
+            tl.to('.hero-label', { opacity: 1, y: 0, duration: 0.8 })
+              .to('.hero-title', { opacity: 1, y: 0, duration: 1, ease: "power4.out" }, "-=0.4")
+              .to('.hero-description', { opacity: 1, y: 0, duration: 1 }, "-=0.6")
+              .from('.scroll-indicator', { opacity: 0, y: 20, duration: 1 }, "-=0.5");
+
+            // Scroll animations for video containers
+            gsap.from('.video-container', {
+                scrollTrigger: {
+                    trigger: '.video-grid',
+                    start: 'top 95%',
+                },
+                y: 30,
+                opacity: 0,
+                duration: 1.2,
+                stagger: 0.2,
+                ease: "power2.out",
+                clearProps: "opacity,transform"
+            });
+
+            // Scroll animations for source cards
+            gsap.from('.source-card', {
+                scrollTrigger: {
+                    trigger: '.sources-grid',
+                    start: 'top 85%',
+                },
+                scale: 0.9,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.2,
+                ease: "back.out(1.7)"
+            });
+        });
+
+        // Mobile Toggle Logic
+        const toggle = document.querySelector('.mobile-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // Smooth Scroll (Simulated for high-end feel)
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

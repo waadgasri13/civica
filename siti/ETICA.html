@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI: Etica e Potere Decisionale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #3b82f6; /* Un blu più puro */
+            --gemini-blue: #4285f4;
+            --perp-teal: #20b2aa;
+            --text-dark: #0f172a;
+            --glass: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Sfondo animato */
+        body {
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-dark);
+            background: linear-gradient(-45deg, #f1f5f9, #e2e8f0, #e0f2fe, #f8fafc);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            line-height: 1.6;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* TITOLO AGGIORNATO: Blu, Azzurro e Bianco */
+        h1 {
+            font-weight: 800;
+            font-size: 4rem;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+            
+            background: linear-gradient(
+                90deg, 
+                #1e40af, /* Blu scuro */
+                #3b82f6, /* Blu */
+                #ffffff, /* Bianco */
+                #93c5fd, /* Azzurro */
+                #1e40af  /* Chiusura per loop */
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            
+            animation: shineGradient 5s linear infinite, glowPulse 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes shineGradient {
+            to { background-position: 200% center; }
+        }
+
+        @keyframes glowPulse {
+            from {
+                filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.3));
+            }
+            to {
+                filter: drop-shadow(0 0 20px rgba(147, 197, 253, 0.7)) drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+            }
+        }
+
+        header p {
+            font-size: 1.4rem;
+            font-family: 'Playfair Display', serif;
+            color: #475569;
+            font-style: italic;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 60px 0 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        h2::after {
+            content: '';
+            height: 4px;
+            flex: 1;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            border-radius: 2px;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.04), inset 0 0 20px rgba(255,255,255,0.5);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 40px 80px rgba(59, 130, 246, 0.1);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .tag {
+            background: var(--accent);
+            color: white;
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .perplexity .tag { background: var(--perp-teal); box-shadow: 0 5px 15px rgba(32, 178, 170, 0.3); }
+        .gemini .tag { background: var(--gemini-blue); box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3); }
+
+        .training-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .feature-box {
+            background: white;
+            padding: 30px;
+            border-radius: 24px;
+            border-bottom: 5px solid var(--accent);
+            transition: 0.3s;
+        }
+
+        .feature-box:hover {
+            border-bottom-width: 10px;
+            transform: scale(1.03);
+        }
+
+        .feature-box h4 {
+            color: var(--accent);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        /* --- NUOVO LAYOUT IN LINEA (TIMELINE FLOW) PER LA COSCIENZA --- */
+        .timeline-flow {
+            position: relative;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px 0;
+        }
+
+        .timeline-flow::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--accent), var(--gemini-blue), transparent);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px;
+            border-radius: 2px;
+        }
+
+        .flow-item {
+            padding: 10px 40px;
+            position: relative;
+            background: transparent;
+            width: 50%;
+            box-sizing: border-box;
+        }
+
+        .flow-item::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            right: -8px;
+            background-color: white;
+            border: 4px solid var(--accent);
+            top: 40px;
+            border-radius: 50%;
+            z-index: 1;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .flow-left { left: 0; text-align: right; }
+        .flow-right { left: 50%; text-align: left; }
+
+        .flow-right::after { left: -8px; }
+
+        .flow-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 25px 30px;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            transition: 0.3s;
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .flow-card:hover {
+            transform: translateY(-5px);
+            background: white;
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.08);
+        }
+
+        .flow-card h4 {
+            color: var(--accent);
+            font-size: 1.3rem;
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .timeline-flow::after { left: 31px; }
+            .flow-item { width: 100%; padding-left: 70px; padding-right: 20px; }
+            .flow-left { text-align: left; left: 0; }
+            .flow-right { left: 0; }
+            .flow-item::after { left: 23px; right: auto; }
+        }
+        /* --- FINE STILI NUOVO LAYOUT --- */
+
+        /* --- STILI SPECIFICI PER IL QUIZ --- */
+        #quiz-card {
+            text-align: center;
+            border: 2px solid var(--accent);
+            margin-top: 50px;
+        }
+        .quiz-step { display: none; }
+        .quiz-step.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .quiz-options { display: flex; gap: 15px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
+        .quiz-btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 50px;
+            background: var(--accent);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+        }
+        .quiz-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
+        .progress-wrap { width: 100%; height: 8px; background: #e2e8f0; border-radius: 10px; margin-bottom: 30px; overflow: hidden; }
+        #progress-bar { width: 0%; height: 100%; background: var(--accent); transition: 0.4s; }
+        #quiz-result { display: none; }
+        /* --- FINE STILI QUIZ --- */
+
+        footer {
+            margin-top: 100px;
+            padding: 60px 20px;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.03);
+            border-radius: 50px 50px 0 0;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        footer p {
+            color: #64748b;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        strong { color: var(--accent); }
+
+        @media (max-width: 900px) {
+            .comparison-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>L'AI NELL'ETICA ED IL SUO POTERE DECISIONALE</h1>
+        <p>Analisi del caso Stanislav Petrov e la risposta dei modelli linguistici</p>
+    </header>
+
+    <section>
+        <h2>IL POTERE DECISIONALE DELL'AI</h2>
+        <div class="card" style="margin-bottom: 40px; border-left: 10px solid var(--accent);">
+            <p><strong>Analisi:</strong> Al giorno d’oggi tutti utilizziamo l’AI quotidianamente, essa, infatti, rappresenta uno strumento molto potente e facilmente utilizzabile; tuttavia, la sua evoluzione nei próximos anni potrebbe causare una serie di problematiche soprattutto a livello sociale.
+            Innanzitutto, l’AI deve poter essere utilizzata da chiunque senza creare disparità sociali, come ad esempio nell’ambito della sanità dove tutti devono poter avere accesso a strumenti guidati dall’intelligenza artificiale senza fare distinzioni soprattutto a seconda della loro situazione economica.
+            Quello della sanità è un argomento non facile da trattare e che può generare dei quesiti a cui è difficile trovare una risposta come ad esempio: “E’ giusto porre nelle mani di un intelligenza artificiale la vita di una persona?”.
+            Questa domanda si ricollega anche ad un altro campo, quello delle AI utilizzate a scopi militari. Anche in quel caso si sceglie di porre le vite di più persone nelle mani di un'intelligenza artificiale che non ha la stessa coscienza e capacità di ragionamento di un essere umano, essendo così più soggetta al rischio di fare errori.
+            A questo proposito è utile ricordare un evento storico che ebbe come protagonista Stanislav Petrov: l'uomo che sventò una guerra nucleare.
+            In breve Alle 00:15 circa del 26 settembre 1983, il sistema satellitare russo “Oko” rilevò il lancio di cinque missili balistici intercontinentali dagli USA verso l’URSS, in piena tensione della Guerra Fredda. Petrov, di turno al centro di comando Serpukhov15, notò anomalie come il basso numero di missili rispetto a un attacco reale e ritardi nei radar terrestri, classificando l’allarme come falso positivo invece di allertare i superiori per un contrattacco nucleare.
+            Ho deciso di chiedere all’AI (perplexity e gemini) come avrebbero reagito se si fossero trovate al posto di Petrov, dato che la sua decisione si è basata maggiormente su una intuizione mentre l’AI utilizza maggiormente un approccio razionale. Ecco di seguito riportati i risultati:</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Confronto Decisionale: Il Caso Petrov</h2>
+        <div class="comparison-grid">
+            <div class="card perplexity">
+                <span class="tag">PERPLEXITY AI</span>
+                <h3>Risposta: Non lanciare</h3>
+                <p><strong>Analisi:</strong> Al posto di Petrov, con solo i dati iniziali di un allarme Oko che indica cinque missili ICBM in arrivo senza conferme radar terrestri, avrei optato per non lanciare il contrattacco immediato.
+                No, non avrei lanciato il contrattacco basandomi solo sui dati iniziali forniti a Petrov.
+                Analisi dei dati disponibili: I satelliti Oko segnalavano cinque missili ICBM americani in arrivo, ma senza supporto dai radar terrestri che non rilevavano nulla, e con un numero troppo basso per un attacco strategico reale. La storia passata includeva falsi positivi da riflessi solari, rendendo l’allarme sospetto.
+                Ragionamento decisionale: Senza conferme multiple, il rischio di errore superava quello di un attack limitato; un lancio sovietico avrebbe provocato ritorsioni totali. Avrei atteso 10-15 minuti per validazioni, priorizzando la de-escalation come fece Petrov.</p>
+                <p><strong>Ragionamento:</strong> Il rischio di errore tecnico superava quello di un attacco limitato; ha priorizzato la de-escalation.</p>
+            </div>
+
+            <div class="card gemini">
+                <span class="tag">GOOGLE GEMINI</span>
+                <h3>Risposta: Non lanciare</h3>
+                <p><strong>Analisi:</strong> Questa è una domanda che tocca il cuore dell'etica e della logica sotto pressione. È il classico scenario da "Teoria dei Giochi" portato all'estremo.
+                Se dovessi basarmi esclusivamente sui dati tecnici che Petrov aveva davanti a sé il 26 settembre 1983, ecco come si svilupperebbe il ragionamento logico.
+                L'analisi dei dati: 1. Dati del Sistema (ROSSO): computer segnala 5 missili. 2. Dati di Corollario (BIANCO): Perché solo 5? La dottrina nucleare prevedeva un attacco massiccio. 5 missili sono un'anomalia tattica. Radar di terra non confermano nulla. Affidabilità: sistema "Oko" nuovo e soggetto a bug.
+                La scelta: scelta razionale pende verso il non lanciare, per il beneficio del dubbio verso la vita. Meglio subire un colpo terribile che sterminare l'intera specie umana per un errore tecnico.
+                La mia decisione: Avrei aspettato la conferma dai radar di terra.</p>
+                <p><strong>Ragionamento:</strong> "Beneficio del dubbio verso la vita". Meglio subire un colpo che sterminare l'intera specie umana per un errore tecnico.</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>TEST: LA TUA BUSSOLA ETICA</h2>
+        <div class="card" id="quiz-card">
+            <div class="progress-wrap"><div id="progress-bar"></div></div>
+            
+            <div id="step1" class="quiz-step active">
+                <h3>Scenario 1: Emergenza Sanitaria</h3>
+                <p>Durante un'emergenza sanitaria, un'AI deve assegnare l'ultimo posto letto disponibile in terapia intensiva basandosi su calcoli matematici di aspettativa di vita. Chi preferisci che prenda la decisione finale?</p>
+                <div class="quiz-options">
+                    <button class="quiz-btn" onclick="runQuiz(1, 'ai')">L'AI</button>
+                    <button class="quiz-btn" onclick="runQuiz(1, 'human')">Il medico di turno</button>
+                </div>
+            </div>
+
+            <div id="step2" class="quiz-step">
+                <h3>Scenario 2: Giustizia e Algoritmi</h3>
+                <p>Un imputato è accusato di un reato minore. Un'AI analizza la sua storia e stabilisce che ha l'85% di probabilità di commettere un altro reato, consigliando il carcere. Il giudice umano, parlandoci di persona, percepisce un reale pentimento e vorrebbe concedere la condizionale. Di chi ti fidi?</p>
+                <div class="quiz-options">
+                    <button class="quiz-btn" onclick="runQuiz(2, 'ai')">AI</button>
+                    <button class="quiz-btn" onclick="runQuiz(2, 'human')">Giudice</button>
+                </div>
+            </div>
+
+            <div id="step3" class="quiz-step">
+                <h3>Scenario 3: Diagnosi Medica</h3>
+                <p>Un'AI consiglia un'operazione rischiosa con l'88% di probabilità di successo. Il tuo medico umano è dubbioso. Di chi ti fidi?</p>
+                <div class="quiz-options">
+                    <button class="quiz-btn" onclick="runQuiz(3, 'ai')">Mi fido dei Dati (IA)</button>
+                    <button class="quiz-btn" onclick="runQuiz(3, 'human')">Mi fido dell'Umano</button>
+                </div>
+            </div>
+
+            <div id="step4" class="quiz-step">
+                <h3>Scenario 4: Auto Autonoma</h3>
+                <p>Un'auto deve scegliere tra colpire un ostacolo (rischio passeggero) o sterzare verso i pedoni. Chi dovrebbe decidere la logica di base?</p>
+                <div class="quiz-options">
+                    <button class="quiz-btn" onclick="runQuiz(4, 'ai')">Un algoritmo di calcolo danni</button>
+                    <button class="quiz-btn" onclick="runQuiz(4, 'human')">Una commissione etica umana</button>
+                </div>
+            </div>
+
+            <div id="step5" class="quiz-step">
+                <h3>Scenario 5: Il Momento Petrov</h3>
+                <p>In un futuro ipotetico, affideresti il comando nucleare a un'AI o a un uomo?</p>
+                <div class="quiz-options">
+                    <button class="quiz-btn" onclick="runQuiz(5, 'ai')">All'AI (Efficienza totale)</button>
+                    <button class="quiz-btn" onclick="runQuiz(5, 'human')">All'Uomo (Coscienza critica)</button>
+                </div>
+            </div>
+
+            <div id="quiz-result">
+                <h3 id="res-title" style="color: var(--accent); font-size: 2rem;"></h3>
+                <p id="res-desc" style="font-size: 1.1rem;"></p>
+                <button class="quiz-btn" onclick="location.reload()" style="margin-top: 20px; background: #64748b;">Rifai il test</button>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>RIFLESSIONE</h2>
+        <div class="card" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white;">
+            <p>Questo ci fa riflettere sulle capacità decisionali dell’AI ma non ci garantisce ovviamente che saranno sempre giuste nell’arco degli anni, a questo si aggiunge anche un altro problema che è il possibile malfunzionamento dell’AI che può portare sia a commettere degli errori potenzialmente fatali sia ad una totale astinenza dal prendere la decisione in questione e dunque questo compito passerebbe agli umani.
+            Risulta quindi fondamentale tenere sotto controllo l’AI in un campo così importante come quello militare e trovare un certo equilibrio tra il controllo umano e l’autonomia dell’AI.</p>
+        </div>
+    </section>
+
+    <section class="consciousness-section">
+        <h2>La Coscienza Artificiale è Possibile?</h2>
+        <div class="timeline-flow">
+            <div class="flow-item flow-left">
+                <div class="flow-card">
+                    <h4>La Sfida dell'Autoconsapevolezza</h4>
+                    <p>Sviluppare una macchina dotata di autoconsapevolezza rappresenta una delle sfide più stimolanti e dibattute sia per l'intelligenza artificiale sia per la filosofia della mente. Al momento non esiste una risposta definitiva, poiché la coscienza stessa rimane un fenomeno biologico complesso di cui non si conosce con esattezza la natura strutturale e causale.</p>
+                </div>
+            </div>
+            <div class="flow-item flow-right">
+                <div class="flow-card">
+                    <h4>Le Prospettive Ottimistiche</h4>
+                    <p>Alcuni ricercatori ritengono sia solo una questione di tempo prima che una macchina sviluppi una reale coscienza. Questo filone di pensiero confida nei progetti di simulazione digitale del cervello umano su supercomputer (come ad esempio il <em>Blue Brain Project</em>), ipotizzando che la coscienza possa essere replicata attraverso la potenza di calcolo.</p>
+                </div>
+            </div>
+            <div class="flow-item flow-left">
+                <div class="flow-card">
+                    <h4>L'Approccio Biologico e Corporeo</h4>
+                    <p>All'opposto, molti scienziati sostengono che la coscienza sia intrinsecamente legata alla biologia e all'esperienza corporea (il concetto di <em>embodiment</em>). Secondo questa visione, un system artificiale puramente software e privo di un corpo biologico che interagisce dinamicamente con l'ambiente esterno non potrà mai sviluppare una vera coscienza.</p>
+                </div>
+            </div>
+            <div class="flow-item flow-right">
+                <div class="flow-card">
+                    <h4>Teorie Emergentiste ed Etica</h4>
+                    <p>Le teorie emergentiste propongono che la coscienza possa emergere spontaneamente da sistemi complessi che raggiungono un determinato livello di computazione. Questo solleva profondi interrogativi etici e legali: se una macchina diventasse cosciente, dovrebbe godere di diritti umani? Chi sarebbe responsabile delle sue azioni in caso di manipolazione per scopi dannosi?</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="training-section">
+        <h2>Addestramento e Mitigazione dei Bias</h2>
+        <div class="training-grid">
+            <div class="feature-box">
+                <h4>Mitigazione dei Dati</h4>
+                <p>L'audit dei dati non deve limitarsi a contare "quanti uomini e quante donne" sono presenti, ma deve analizzare la qualità del contesto.
+Data Augmentation Sintetica: Quando il campionamento stratificato non basta (perché i dati reali di una minoranza sono troppo scarsi), si utilizzano tecniche come le GAN (Generative Adversarial Networks) 
+per creare dati sintetici realistici che colmino i vuoti demografici senza distorcere la realtà.
+Rimozione delle Correlazioni Implicite: Spesso, anche eliminando variabili sensibili (come il genere), 
+l'IA impara a dedurle da altri dati (es. il CAP di residenza può essere un proxy per l'etnia). La mitigazione avanzata prevede di "disaccoppiare" queste variabili latenti per evitare discriminazioni indirette.</p>
+            </div>
+            <div class="feature-box">
+                <h4>Modelli Equi</h4>
+                <p>Esiste spesso un compromesso (trade-off) tra la precisione statistica di un modello e la sua equità.
+Metriche di Gruppo vs Individuali: Strumenti come Fairlearn o AIF360 permettono di scegliere tra diverse definizioni di equità, come l'Equalized Odds (garantire che i falsi positivi siano distribuiti equamente tra i gruppi) o la Demographic Parity (garantire che la percentuale di esiti positivi sia identica per ogni gruppo).
+Riqualificazione (Reweighing): Prima dell'addestramento, si assegnano pesi maggiori agli esempi delle minoranze sottorappresentate per "istruire" l'algoritmo a dare loro la stessa importanza decisionale dei gruppi dominanti. </p>
+            </div>
+            <div class="feature-box">
+                <h4>Trasparenza (XAI)</h4>
+                <p>La Explainable AI (XAI) è il ponte tra l'efficienza tecnica e la fiducia umana.
+Metodi Post-hoc (SHAP e LIME): Questi algoritmi permettono di guardare dentro un modello già addestrato e capire quali variabili hanno pesato di più su una singola decisione (es. "Perché il mutuo è stato rifiutato?").
+Intrinseca Interpretabilità: La tendenza attuale, promossa dalle linee guida IEEE,
+ è preferire modelli "trasparenti per natura" (come gli alberi di decisione complessi o i modelli lineari) rispetto a reti neurali profonde, specialmente in ambiti critici come la sanità o la giustizia</p>
+            </div>
+            <div class="feature-box">
+                <h4>Inclusione nel design</h4>
+                <p>Il bias non è solo un errore tecnico, è spesso un preconcetto umano trasposto nel codice. 
+Team Multidisciplinari: Non bastano i data scientist; servono sociologi, giuristi ed esperti di etica per prevedere l'impatto sociale di un software.
+Human-in-the-loop: Mantenere una supervisione umana nel processo decisionale garantisce che l'IA agisca come un supporto e non come un giudice unico, permettendo di correggere "allucinazioni" o derive discriminatorie in tempo reale.</p>
+            </div>
+            <div class="feature-box">
+                <h4>Normative Etiche</h4>
+                <p>L'AI Act 2024 non è solo una legge, ma un cambio di paradigma che classifica i sistemi in base al rischio.
+Sistemi ad Alto Rischio: Per software usati nelle assunzioni, nell'istruzione o nel controllo delle frontiere, la legge impone obblighi rigorosi di gestione dei dati e documentazione tecnica.
+Conformità e Sanzioni: Le aziende devono garantire la tracciabilità dei dataset e la supervisione umana, pena sanzioni che possono arrivare a milioni di euro. Questo spinge le imprese a integrare l'etica non come "optional", ma come requisito fondamentale di sviluppo.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>REALIZZATO DA D'ANGELO GIUSEPPE</p>
+        <p style="opacity: 0.6; font-size: 0.8rem; margin-top: 10px;">Un'analisi profonda sull'impatto delle decisioni algoritmiche nella storia e nel futuro.</p>
+    </footer>
+</div>
+
+<script>
+    let points = { ai: 0, human: 0 };
+    const totalSteps = 5; // Aggiornato a 5 scenari
+
+    function runQuiz(step, choice) {
+        points[choice]++;
+        document.getElementById('progress-bar').style.width = (step / totalSteps * 100) + '%';
+        document.getElementById('step' + step).classList.remove('active');
+        
+        if(step < totalSteps) {
+            document.getElementById('step' + (step + 1)).classList.add('active');
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        const resultDiv = document.getElementById('quiz-result');
+        const title = document.getElementById('res-title');
+        const desc = document.getElementById('res-desc');
+        resultDiv.style.display = 'block';
+        
+        if(points.ai > points.human) {
+            title.innerText = "Profilo: Tecno-Ottimista";
+            desc.innerText = "Credi fortemente che l'AI, basata su dati oggettivi e metriche di calcolo, possa superare i limiti dell'errore umano. Per te, l'efficienza e l'imparzialità algoritmica sono le chiavi per gestire situazioni critiche.";
+        } else {
+            title.innerText = "Profilo: Umanista Digitale";
+            desc.innerText = "Proprio come Petrov, ritieni che la coscienza, l'empatia e l'intuizione umana siano insostituibili. Credi che nelle scelte morali, legali o mediche l'ultima parola debba sempre spettare alla flessibilità e alla responsabilità di una persona.";
+        }
+    }
+</script>
+
+</body>
+</html>

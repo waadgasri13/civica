@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intelligenza Artificiale & Diritto</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0e0e0f;
+      --surface: #141416;
+      --surface2: #1b1b1e;
+      --gold: #c8a96e;
+      --gold-dim: #8a7048;
+      --cream: #f0ead8;
+      --cream-dim: #b0a890;
+      --text: #d8d2c4;
+      --muted: #6e6860;
+      --line: rgba(200,169,110,0.18);
+      --radius: 2px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.75;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.5;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(14,14,15,0.92);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--line);
+      padding: 0 4vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-logo {
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 200;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 300;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--cream-dim);
+      text-decoration: none;
+      padding: 8px 16px;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 4px; left: 16px; right: 16px;
+      height: 1px;
+      background: var(--gold);
+      transform: scaleX(0);
+      transition: transform 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--gold); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+
+    /* burger */
+    .burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .burger span { width: 22px; height: 1px; background: var(--gold); display: block; transition: 0.3s; }
+
+    /* ── HERO ── */
+    #home {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 8vw 10vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 80% 30%, rgba(200,169,110,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 20% 80%, rgba(200,169,110,0.04) 0%, transparent 60%);
+    }
+
+    .hero-line {
+      position: absolute;
+      top: 0; bottom: 0; left: 50%;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--line) 30%, var(--line) 70%, transparent);
+      opacity: 0.5;
+    }
+
+    .hero-label {
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 200;
+      font-size: 10px;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 1s 0.3s forwards;
+    }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(3.2rem, 7vw, 7.5rem);
+      line-height: 1.05;
+      color: var(--cream);
+      letter-spacing: -0.01em;
+      max-width: 820px;
+      opacity: 0;
+      animation: fadeUp 1s 0.5s forwards;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-sub {
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 200;
+      font-size: 12px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 32px;
+      max-width: 460px;
+      opacity: 0;
+      animation: fadeUp 1s 0.7s forwards;
+    }
+
+    .scroll-cue {
+      position: absolute;
+      bottom: 40px; right: 8vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0;
+      animation: fadeIn 1s 1.2s forwards;
+    }
+
+    .scroll-cue::after {
+      content: '';
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: lineGrow 2s 1.5s infinite;
+    }
+
+    /* ── SECTIONS ── */
+    .section {
+      padding: 120px 8vw;
+      border-top: 1px solid var(--line);
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section-header {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 0 40px;
+      align-items: start;
+      margin-bottom: 72px;
+    }
+
+    .section-num {
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 200;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      padding-top: 18px;
+      text-align: right;
+    }
+
+    .section-title-wrap {}
+
+    .section-tag {
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 200;
+      font-size: 9px;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2.2rem, 4vw, 3.8rem);
+      color: var(--cream);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+    }
+
+    h2 em { font-style: italic; color: var(--gold); }
+
+    .divider {
+      width: 60px;
+      height: 1px;
+      background: var(--gold);
+      margin: 28px 0;
+      opacity: 0.6;
+    }
+
+    /* ── CONTENT GRID ── */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px 80px;
+      margin-top: 48px;
+    }
+
+    .content-single {
+      max-width: 780px;
+    }
+
+    .content-wide {
+      grid-column: 1 / -1;
+    }
+
+    p {
+      color: var(--text);
+      font-size: 1.05rem;
+      line-height: 1.9;
+      margin-bottom: 1.4em;
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 36px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover { border-color: var(--gold-dim); }
+    .card:hover::before { opacity: 1; }
+
+    .card-icon {
+      font-size: 1.6rem;
+      margin-bottom: 18px;
+      opacity: 0.7;
+    }
+
+    h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 1.5rem;
+      color: var(--cream);
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+
+    h3 em { font-style: italic; color: var(--gold); }
+
+    /* ── TIMELINE ── */
+    .timeline {
+      position: relative;
+      padding-left: 36px;
+      margin-top: 16px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 8px; bottom: 8px;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 36px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -40px;
+      top: 8px;
+      width: 8px; height: 8px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      background: var(--bg);
+    }
+
+    .timeline-year {
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 200;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+
+    .timeline-item p { margin-bottom: 0; }
+
+    /* ── RISK TABLE ── */
+    .risk-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      margin-top: 32px;
+    }
+
+    .risk-cell {
+      padding: 28px 20px;
+      border: 1px solid var(--line);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .risk-cell:hover { border-color: var(--gold-dim); background: var(--surface2); }
+
+    .risk-label {
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 200;
+      font-size: 9px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .risk-unacceptable .risk-label { color: #c87070; }
+    .risk-high .risk-label { color: #c8a46e; }
+    .risk-limited .risk-label { color: #a0a870; }
+    .risk-minimal .risk-label { color: #70a870; }
+
+    .risk-cell h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 1rem;
+      color: var(--cream);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .risk-cell p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* ── HIGHLIGHT BOX ── */
+    .highlight-box {
+      border-left: 2px solid var(--gold);
+      padding: 24px 28px;
+      background: rgba(200,169,110,0.04);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      margin: 32px 0;
+    }
+
+    .highlight-box p {
+      font-size: 1.1rem;
+      color: var(--cream-dim);
+      font-style: italic;
+      margin: 0;
+    }
+
+    /* ── FINE SECTION ── */
+    .fine-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .fine-card {
+      border: 1px solid var(--line);
+      padding: 32px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+
+    .fine-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      transform: scaleX(0);
+      transition: transform 0.4s;
+    }
+
+    .fine-card.red::after { background: #c87070; }
+    .fine-card.orange::after { background: #c8a46e; }
+    .fine-card.yellow::after { background: var(--gold); }
+
+    .fine-card:hover { border-color: var(--gold-dim); }
+    .fine-card:hover::after { transform: scaleX(1); }
+
+    .fine-amount {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 2.8rem;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .fine-unit {
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 200;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .fine-desc {
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── ABOUT / META ── */
+    #meta {
+      background: var(--surface);
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 48px;
+      margin-top: 48px;
+    }
+
+    .meta-block h4 {
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 300;
+      font-size: 10px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .meta-block p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .color-swatches {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .swatch {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+    }
+
+    .swatch-dot {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── IMAGES ── */
+    .section-image {
+      width: 100%;
+      margin: 64px 0 0;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+
+    .section-image img {
+      width: 100%;
+      height: 340px;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(30%) brightness(0.7) sepia(20%);
+      transition: filter 0.6s ease, transform 0.6s ease;
+    }
+
+    .section-image:hover img {
+      filter: grayscale(10%) brightness(0.85) sepia(10%);
+      transform: scale(1.02);
+    }
+
+    .section-image-caption {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 14px 24px;
+      background: linear-gradient(to top, rgba(14,14,15,0.9), transparent);
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 200;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--cream-dim);
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-top: 64px;
+    }
+
+    .image-grid .section-image {
+      margin: 0;
+      border: none;
+    }
+
+    .image-grid .section-image img {
+      height: 260px;
+    }
+
+    /* ── META EXTENDED ── */
+    .meta-block-wide {
+      grid-column: 1 / -1;
+    }
+
+    .meta-block-wide p { font-size: 0.92rem; }
+
+    .code-snippet {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--line);
+      border-left: 2px solid var(--gold-dim);
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+      color: var(--cream-dim);
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+
+    .meta-stat-row {
+      display: flex;
+      gap: 0;
+      margin-top: 24px;
+      border: 1px solid var(--line);
+    }
+
+    .meta-stat {
+      flex: 1;
+      padding: 20px 16px;
+      text-align: center;
+      border-right: 1px solid var(--line);
+    }
+
+    .meta-stat:last-child { border-right: none; }
+
+    .meta-stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 2.2rem;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .meta-stat-label {
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 200;
+      font-size: 8px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .principle-list {
+      list-style: none;
+      margin-top: 16px;
+    }
+
+    .principle-list li {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.9rem;
+      color: var(--text);
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      line-height: 1.6;
+    }
+
+    .principle-list li::before {
+      content: '—';
+      color: var(--gold);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 40px 8vw;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    footer p {
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 200;
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes lineGrow {
+      0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
+      50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+      51%  { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+      100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .content-grid { grid-template-columns: 1fr; gap: 40px; }
+      .risk-grid { grid-template-columns: 1fr 1fr; }
+      .fine-grid { grid-template-columns: 1fr; }
+      .meta-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; flex-direction: column; position: fixed; top: 64px; left: 0; right: 0; background: rgba(14,14,15,0.98); padding: 24px 8vw; border-bottom: 1px solid var(--line); gap: 0; }
+      .nav-links.open { display: flex; }
+      .burger { display: flex; }
+      .section-header { grid-template-columns: 1fr; }
+      .section-num { text-align: left; padding-top: 0; margin-bottom: 8px; }
+    }
+
+    @media (max-width: 600px) {
+      .risk-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 2.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-logo">IA &amp; Diritto</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#evoluzione">Evoluzione</a></li>
+    <li><a href="#privacy">Privacy &amp; IA</a></li>
+    <li><a href="#ai-act">AI Act</a></li>
+    <li><a href="#sanzioni">Sanzioni UE</a></li>
+    <li><a href="#garante">Garante</a></li>
+    <li><a href="#italia">Italia</a></li>
+    <li><a href="#deepfake">Deepfake</a></li>
+    <li><a href="#meta">Il Sito</a></li>
+  </ul>
+  <div class="burger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-line"></div>
+  <p class="hero-label">Diritto &amp; Tecnologia</p>
+  <h1>Intelligenza<br>Artificiale &amp;<br><em>Ordinamento</em><br>Giuridico</h1>
+  <p class="hero-sub">Evoluzione legislativa in Europa e in Italia — dalla tutela della privacy alla regolamentazione dei sistemi algoritmici</p>
+  <div class="scroll-cue">Scorri</div>
+</section>
+
+<!-- ── 01 EVOLUZIONE LEGISLATIVA ── -->
+<section class="section" id="evoluzione">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title-wrap">
+      <div class="section-tag">Contesto Storico-Normativo</div>
+      <h2>Evoluzione Legislativa<br>in <em>Europa e Italia</em></h2>
+      <div class="divider"></div>
+    </div>
+  </div>
+
+  <div class="content-single">
+    <p>La regolamentazione dell'intelligenza artificiale in Europa ha seguito un percorso graduale, passando da atti di indirizzo politico a veri e propri strumenti normativi vincolanti. L'Unione Europea si è rivelata il legislatore più attivo al mondo in questo settore, anticipando qualsiasi intervento organico da parte di Stati Uniti o Cina.</p>
+    <p>In Italia, il quadro si è sviluppato su un doppio binario: l'applicazione diretta dei regolamenti comunitari e la progressiva costruzione di una normativa nazionale, ancora in evoluzione, che tenta di bilanciare innovazione e tutela dei diritti fondamentali.</p>
+  </div>
+
+  <div class="content-grid" style="margin-top:64px;">
+    <div>
+      <h3>Il Percorso <em>Europeo</em></h3>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-year">2016</div>
+          <p>Adozione del Regolamento Generale sulla Protezione dei Dati (GDPR), primo grande tassello normativo indirettamente applicabile all'IA, che disciplina il trattamento automatizzato dei dati personali e introduce il diritto alla spiegazione delle decisioni algoritmiche.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2018</div>
+          <p>La Commissione Europea pubblica la <em>Comunicazione sull'Intelligenza Artificiale per l'Europa</em>, avviando un processo di consultazione pubblica e ponendo le basi per una strategia continentale coordinata.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2019</div>
+          <p>Pubblicazione delle <em>Linee guida etiche per un'IA affidabile</em> da parte del gruppo di esperti ad alto livello sull'IA (AI HLEG). Viene identificata la necessità di un'IA "lecita, etica e robusta".</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2021</div>
+          <p>La Commissione propone il Regolamento sull'Intelligenza Artificiale (AI Act), prima proposta legislativa organica a livello mondiale per la disciplina dei sistemi di IA, fondata su un approccio basato sul rischio.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2024</div>
+          <p>Approvazione definitiva dell'AI Act da parte del Parlamento Europeo (marzo 2024), pubblicazione nella Gazzetta Ufficiale UE e avvio del periodo transitorio, con vigenza progressiva delle norme fino al 2026–2027.</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3>Il Percorso <em>Italiano</em></h3>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-year">2018</div>
+          <p>Recepimento del GDPR con il D.Lgs. n. 101/2018, che adegua il Codice della privacy italiano al regolamento europeo, rafforzando le competenze del Garante per la protezione dei dati personali in materia di trattamenti automatizzati.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2021</div>
+          <p>Il Governo italiano adotta la <em>Strategia Nazionale per l'Intelligenza Artificiale 2022–2024</em>, documento programmatico che individua settori prioritari (salute, PA, industria) e misure per lo sviluppo responsabile dell'IA.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2023</div>
+          <p>Il Garante della Privacy interviene contro OpenAI ordinando la sospensione temporanea di ChatGPT, primo provvedimento al mondo di questo tipo, che ha portato a un dialogo internazionale sull'applicazione del GDPR ai modelli linguistici di grandi dimensioni (LLM).</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2024</div>
+          <p>Il Parlamento italiano approva la <em>Legge n. 90/2024</em> sulla cybersicurezza e avvia i lavori per il Disegno di Legge sull'Intelligenza Artificiale (DDL IA), approvato dal Consiglio dei Ministri nel maggio 2024 e in iter parlamentare per la conversione definitiva.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2025</div>
+          <p>Avanzamento nell'iter di approvazione del DDL IA italiano, con discussioni parlamentari su norme specifiche per deepfake, trasparenza algoritmica e responsabilità dei fornitori di sistemi di IA. L'Italia si prepara ad adeguarsi all'AI Act europeo.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── IMAGE: Parlamento Europeo ── -->
+<div style="padding:0 8vw; border-top:1px solid var(--line); overflow:hidden;">
+  <div class="section-image" style="margin:0;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/European_Parliament_Strasbourg_Hemicycle_-_Diliff.jpg/1280px-European_Parliament_Strasbourg_Hemicycle_-_Diliff.jpg" alt="Parlamento Europeo — Emiciclo di Strasburgo" loading="lazy" />
+    <div class="section-image-caption">Parlamento Europeo — Emiciclo di Strasburgo, sede dell'approvazione dell'AI Act (2024)</div>
+  </div>
+</div>
+
+<!-- ── 02 PRIVACY & IA ── -->
+<section class="section" id="privacy">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title-wrap">
+      <div class="section-tag">Tutela dei Dati Personali</div>
+      <h2>Leggi di Contrasto alle<br><em>Violazioni della Privacy</em><br>da parte delle Aziende IA</h2>
+      <div class="divider"></div>
+    </div>
+  </div>
+
+  <div class="content-single">
+    <p>Le aziende che sviluppano e distribuiscono sistemi di intelligenza artificiale si trovano al centro di un complesso sistema normativo dedicato alla protezione dei dati personali. Il GDPR costituisce il pilastro fondamentale di tale sistema, ma non agisce da solo: si affianca a una serie di atti normativi specifici che ne estendono e precisano la portata nel dominio algoritmico.</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="card">
+      <div class="card-icon">🔐</div>
+      <h3>GDPR<br><em>Regolamento 2016/679</em></h3>
+      <p>Il pilastro normativo europeo in materia di protezione dei dati. Impone ai sistemi di IA che trattano dati personali il rispetto dei principi di liceità, minimizzazione, limitazione della finalità e integrità. L'art. 22 disciplina le decisioni automatizzate, inclusa la profilazione, riconoscendo il diritto dell'interessato di non essere sottoposto a tali processi senza adeguate garanzie.</p>
+      <p>I fornitori di IA devono eseguire una Valutazione d'Impatto sulla Protezione dei Dati (DPIA) quando il trattamento è suscettibile di generare rischi elevati per i diritti degli individui.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚖️</div>
+      <h3>AI Act &amp;<br><em>Intersezione con il GDPR</em></h3>
+      <p>L'AI Act non sostituisce il GDPR ma si sovrappone ad esso. I sistemi di IA ad alto rischio che trattano dati personali devono rispettare entrambi i regolamenti. Questa duplice obbligazione crea un sistema di conformità stratificato: i fornitori devono documentare i dataset di addestramento, garantirne la qualità e dimostrare l'assenza di bias sistematici, anche ai fini della protezione dei dati.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h3>Direttiva ePrivacy<br><em>e Cookie Policy</em></h3>
+      <p>La Direttiva 2002/58/CE (ePrivacy), in corso di revisione verso un Regolamento direttamente applicabile, disciplina il tracciamento online. I sistemi di IA che utilizzano tecniche di tracking comportamentale per addestrare modelli o personalizzare output devono rispettare le norme sul consenso, particolarmente rilevanti nel settore dell'advertising algoritmico.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏛️</div>
+      <h3>Data Act &amp;<br><em>Data Governance Act</em></h3>
+      <p>Il Regolamento (UE) 2023/2854 (Data Act) e il Regolamento (UE) 2022/868 (Data Governance Act) completano il quadro normativo disciplinando la condivisione e il riutilizzo dei dati. Per le aziende IA, queste norme incidono sulla possibilità di accedere a dati di terzi per addestrare modelli, imponendo condizioni di equità, trasparenza e non discriminazione nell'accesso ai dati.</p>
+    </div>
+  </div>
+
+  <div class="highlight-box" style="margin-top:64px;">
+    <p>"Le aziende che sviluppano sistemi di IA non sono semplici titolari del trattamento: sono, al contempo, responsabili del trattamento per conto dei propri clienti e, in quanto fornitrici di sistemi ad alto rischio, soggette agli obblighi dell'AI Act. Questa molteplicità di ruoli rende la compliance un esercizio di ingegneria normativa."</p>
+  </div>
+
+  <div class="content-grid" style="margin-top:40px;">
+    <div>
+      <h3>Obblighi Principali<br>per le <em>Aziende IA</em></h3>
+      <p><strong style="color:var(--cream-dim)">Trasparenza algortimica:</strong> obbligo di informare gli utenti quando interagiscono con un sistema di IA e, nelle decisioni ad alto impatto, di fornire spiegazioni comprensibili del ragionamento algoritmico.</p>
+      <p><strong style="color:var(--cream-dim)">Minimizzazione dei dati:</strong> i modelli di IA devono essere addestrati con la quantità minima necessaria di dati personali; tecniche come il differential privacy e il federated learning sono sempre più raccomandate come misure di privacy by design.</p>
+      <p><strong style="color:var(--cream-dim)">Diritto all'oblio e portabilità:</strong> le aziende devono prevedere meccanismi per soddisfare le richieste di cancellazione e portabilità dei dati anche quando questi siano stati utilizzati nell'addestramento dei modelli, sfida tecnica ancora parzialmente irrisolta.</p>
+    </div>
+    <div>
+      <h3>Casistica e<br><em>Provvedimenti Rilevanti</em></h3>
+      <p><strong style="color:var(--cream-dim)">ChatGPT / OpenAI (2023):</strong> Il Garante italiano ha ordinato il blocco temporaneo del servizio contestando l'assenza di base giuridica per la raccolta massiva di dati e la mancanza di sistemi di verifica dell'età. OpenAI ha introdotto misure correttive ottenendo la riattivazione del servizio.</p>
+      <p><strong style="color:var(--cream-dim)">Clearview AI:</strong> Autorità di diversi Paesi UE hanno irrogato sanzioni milionarie all'azienda americana di riconoscimento facciale per aver raccolto senza consenso miliardi di immagini dal web, in violazione del GDPR.</p>
+      <p><strong style="color:var(--cream-dim)">Meta / Modelli Generativi (2024):</strong> Diverse autorità europee hanno avviato indagini sull'utilizzo dei dati degli utenti per addestrare i modelli generativi di Meta, contestando la legittimità dell'interesse legittimo come base giuridica.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── 03 AI ACT ── -->
+<section class="section" id="ai-act">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title-wrap">
+      <div class="section-tag">Regolamentazione Europea</div>
+      <h2><em>AI Act</em> — Evoluzione,<br>Struttura e Rischi</h2>
+      <div class="divider"></div>
+    </div>
+  </div>
+
+  <div class="content-single">
+    <p>Il Regolamento (UE) 2024/1689, noto come AI Act, è il primo sistema normativo organico al mondo dedicato specificamente all'intelligenza artificiale. Entrato in vigore nell'agosto 2024, dispiega i propri effetti in modo progressivo attraverso un periodo transitorio articolato su più fasi, con piena applicazione prevista entro il 2027.</p>
+  </div>
+
+  <div class="content-grid">
+    <div>
+      <h3>Struttura e<br><em>Approccio Basato sul Rischio</em></h3>
+      <p>L'AI Act adotta un approccio proporzionale: quanto più un sistema di IA presenta rischi per i diritti fondamentali, tanto più stringenti sono gli obblighi normativi. Questa logica si traduce in quattro categorie di rischio, ciascuna con un regime regolatorio distinto.</p>
+      <p>I fornitori di sistemi di IA devono valutare correttamente il livello di rischio del proprio sistema, registrarsi nell'apposita banca dati europea (EU AI Database) per i sistemi ad alto rischio, e predisporre la documentazione tecnica richiesta.</p>
+    </div>
+    <div>
+      <h3>Calendario di<br><em>Applicazione</em></h3>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-year">Agosto 2024</div>
+          <p>Entrata in vigore del Regolamento. Inizio del periodo transitorio di adeguamento.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">Febbraio 2025</div>
+          <p>Divieti sui sistemi di IA a rischio inaccettabile diventano applicabili.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">Agosto 2025</div>
+          <p>Applicazione delle regole sui modelli di IA per uso generale (GPAI) e governance della catena del valore.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">Agosto 2026</div>
+          <p>Piena applicazione per i sistemi ad alto rischio (Allegato III). Obbligo di conformità per i deployer nel settore pubblico.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">Agosto 2027</div>
+          <p>Applicazione completa per i sistemi ad alto rischio già disciplinati da normativa settoriale preesistente.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="risk-grid" style="margin-top:64px;">
+    <div class="risk-cell risk-unacceptable">
+      <div class="risk-label">Rischio Inaccettabile</div>
+      <h4>Pratiche Vietate</h4>
+      <p>Manipolazione subliminale, sfruttamento di vulnerabilità, social scoring, sorveglianza biometrica in tempo reale in spazi pubblici, riconoscimento delle emozioni sul posto di lavoro e nelle scuole.</p>
+    </div>
+    <div class="risk-cell risk-high">
+      <div class="risk-label">Alto Rischio</div>
+      <h4>Obblighi Stringenti</h4>
+      <p>Infrastrutture critiche, istruzione, occupazione, servizi pubblici essenziali, giustizia penale, gestione delle frontiere. Richiedono DPIA, documentazione, supervisione umana e registrazione in banca dati UE.</p>
+    </div>
+    <div class="risk-cell risk-limited">
+      <div class="risk-label">Rischio Limitato</div>
+      <h4>Obblighi di Trasparenza</h4>
+      <p>Chatbot, sistemi che generano contenuti sintetici (testi, audio, video, immagini), deepfake. Obbligo di informare l'utente circa la natura artificiale del contenuto o dell'interlocutore.</p>
+    </div>
+    <div class="risk-cell risk-minimal">
+      <div class="risk-label">Rischio Minimo</div>
+      <h4>Nessun Obbligo Specifico</h4>
+      <p>Filtri antispam, videogiochi con IA, sistemi di raccomandazione di contenuti senza profilazione invasiva. Rimane applicabile il diritto generale e possono applicarsi codici di condotta volontari.</p>
+    </div>
+  </div>
+
+  <div class="content-grid" style="margin-top:64px;">
+    <div>
+      <h3>Rischi <em>Identificati</em><br>dall'AI Act</h3>
+      <p><strong style="color:var(--cream-dim)">Bias algoritmici:</strong> i sistemi di IA che riproducono o amplificano pregiudizi presenti nei dati di addestramento possono generare discriminazioni sistematiche in settori come credito, lavoro e accesso ai servizi pubblici.</p>
+      <p><strong style="color:var(--cream-dim)">Opacità dei modelli:</strong> i modelli di IA complessi (black box) rendono difficile spiegare le decisioni adottate, ostacolando il diritto al ricorso e la supervisione umana.</p>
+      <p><strong style="color:var(--cream-dim)">Concentrazione del potere:</strong> il dominio di poche grandi piattaforme nello sviluppo di modelli fondazionali crea dipendenze tecnologiche e rischi per la concorrenza e la sovranità digitale europea.</p>
+    </div>
+    <div>
+      <h3>Modelli di IA<br>per <em>Uso Generale (GPAI)</em></h3>
+      <p>L'AI Act introduce una disciplina specifica per i modelli GPAI (come GPT-4, Gemini, Claude, ecc.), che possono essere impiegati per molteplici scopi. I fornitori sono soggetti a obblighi di trasparenza, documentazione tecnica e rispetto del diritto d'autore nell'addestramento.</p>
+      <p>I modelli GPAI con "rischio sistemico" — quelli addestrati con capacità computazionale superiore a 10²⁵ FLOP — sono soggetti a obblighi aggiuntivi: valutazione avversariale, notifica degli incidenti all'UAIO (Ufficio per l'IA dell'UE) e adozione di misure di sicurezza informatica.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── IMAGE: AI Act ── -->
+<div style="padding:0 8vw; border-top:1px solid var(--line); overflow:hidden;">
+  <div class="image-grid">
+    <div class="section-image">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Artificial_intelligence_in_law.jpg/1280px-Artificial_intelligence_in_law.jpg" alt="Intelligenza artificiale e diritto" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=60'" />
+      <div class="section-image-caption">Intelligenza Artificiale e Ordinamento Giuridico</div>
+    </div>
+    <div class="section-image">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Europarl_logo.svg/1200px-Europarl_logo.svg.png" alt="Simbolo UE e regolamentazione" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=60'" style="object-fit:contain; background:#111; padding:40px;" />
+      <div class="section-image-caption">Regolamento (UE) 2024/1689 — AI Act</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 04 SANZIONI UE ── -->
+<section class="section" id="sanzioni">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title-wrap">
+      <div class="section-tag">Enforcement Europeo</div>
+      <h2>Sanzioni dell'UE per<br><em>Violazioni della Privacy</em><br>nel Settore IA</h2>
+      <div class="divider"></div>
+    </div>
+  </div>
+
+  <div class="content-single">
+    <p>L'Unione Europea dispone di un arsenale sanzionatorio robusto per le aziende che violano le norme sulla privacy nell'ambito dei sistemi di intelligenza artificiale. Le sanzioni derivano da un quadro normativo plurale: GDPR, AI Act, e normativa settoriale si sovrappongono, con il rischio concreto di sanzioni cumulative per la stessa condotta illecita.</p>
+  </div>
+
+  <div class="fine-grid">
+    <div class="fine-card red">
+      <div class="fine-amount">35M€</div>
+      <div class="fine-unit">o 7% fatturato globale</div>
+      <div class="fine-desc">Sanzione massima AI Act per violazioni delle pratiche vietate (rischio inaccettabile): sistemi di social scoring, manipolazione subliminale, sorveglianza biometrica non autorizzata.</div>
+    </div>
+    <div class="fine-card orange">
+      <div class="fine-amount">15M€</div>
+      <div class="fine-unit">o 3% fatturato globale</div>
+      <div class="fine-desc">Sanzione per violazione degli obblighi applicabili ai sistemi ad alto rischio: mancanza di documentazione, assenza di supervisione umana, sistemi non registrati nella banca dati UE.</div>
+    </div>
+    <div class="fine-card yellow">
+      <div class="fine-amount">20M€</div>
+      <div class="fine-unit">o 4% fatturato annuo</div>
+      <div class="fine-desc">Sanzione massima GDPR per violazioni gravi (art. 83(5)): trattamento illecito di dati biometrici o di categorie speciali senza base giuridica, violazione dei principi fondamentali.</div>
+    </div>
+  </div>
+
+  <div class="content-grid" style="margin-top:64px;">
+    <div>
+      <h3>Meccanismo di<br><em>Enforcement dell'AI Act</em></h3>
+      <p>L'AI Act prevede un sistema di vigilanza su due livelli: le Autorità Nazionali Competenti (ANC) negli Stati membri, responsabili per le PMI e i soggetti diversi dai fornitori di GPAI, e l'Ufficio per l'IA (AI Office) della Commissione Europea, competente in via esclusiva per i modelli GPAI di uso generale e i loro rischi sistemici.</p>
+      <p>In caso di violazioni da parte di fornitori di GPAI a rischio sistemico, l'AI Office può condurre ispezioni, richiedere documentazione tecnica e irrogare sanzioni direttamente. Questa centralizzazione distingue l'AI Act dal GDPR, che affida l'enforcement alle sole autorità nazionali.</p>
+    </div>
+    <div>
+      <h3>Casi di<br><em>Rilievo Sanzionatorio</em></h3>
+      <p><strong style="color:var(--cream-dim)">Amazon (2021):</strong> Il Garante lussemburghese ha irrogato una sanzione GDPR di 746 milioni di euro per trattamento illecito dei dati degli utenti attraverso sistemi algoritmici di advertising e profilazione, record assoluto al momento della decisione.</p>
+      <p><strong style="color:var(--cream-dim)">Meta Ireland (2023):</strong> Sanzione da 1,2 miliardi di euro dell'autorità irlandese (DPC) per trasferimento illecito di dati personali verso gli USA, utilizzati anche per addestrare sistemi di IA. La più alta sanzione GDPR mai irrogata.</p>
+      <p><strong style="color:var(--cream-dim)">Clearview AI (multi-country):</strong> Sanzioni coordinate da parte di autorità di UK, Francia, Italia, Grecia e Austria per raccolta illecita di dati biometrici tramite sistemi di riconoscimento facciale basati su IA. Sanzioni aggregate superiori a 100 milioni di euro.</p>
+    </div>
+  </div>
+
+  <div class="highlight-box" style="margin-top:40px;">
+    <p>Un'azienda che sviluppa un sistema di IA ad alto rischio violando simultaneamente l'AI Act e il GDPR potrebbe teoricamente essere soggetta a una sanzione massima pari al 7% del fatturato globale ai sensi dell'AI Act, più il 4% ai sensi del GDPR: un cumulo sanzionatorio potenzialmente devastante per qualsiasi impresa.</p>
+  </div>
+</section>
+
+<!-- ── 05 GARANTE ── -->
+<section class="section" id="garante">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title-wrap">
+      <div class="section-tag">Autorità di Controllo Italiana</div>
+      <h2>Il <em>Garante</em> della Privacy<br>in Italia</h2>
+      <div class="divider"></div>
+    </div>
+  </div>
+
+  <div class="content-single">
+    <p>Il Garante per la protezione dei dati personali è l'autorità di controllo indipendente italiana, istituita con la Legge n. 675/1996 e oggi disciplinata dal D.Lgs. n. 196/2003 (Codice della Privacy) come modificato dal D.Lgs. n. 101/2018 in recepimento del GDPR. Nell'era dell'intelligenza artificiale, il Garante ha assunto un ruolo centrale nella definizione dei confini leciti dell'uso dei dati nei sistemi algoritmici.</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="card">
+      <div class="card-icon">🏛️</div>
+      <h3>Composizione e<br><em>Indipendenza</em></h3>
+      <p>Il Garante è un organo collegiale composto da quattro membri eletti dal Parlamento italiano, che durano in carica quattro anni (rinnovabili una sola volta). I commissari devono provenire da categorie di qualificata e comprovata esperienza nel settore della protezione dei dati o nelle materie giuridiche, informatiche, della telecomunicazione e comunicazione. La Presidenza di turno è eletta internamente.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚖️</div>
+      <h3>Poteri e<br><em>Competenze</em></h3>
+      <p>Il Garante dispone di poteri istruttori (ispezioni, richieste di informazioni), poteri correttivi (ordini, limitazioni o divieti di trattamento), poteri autorizzativi e poteri sanzionatori. In materia di IA, ha competenza su tutti i sistemi che trattano dati personali di soggetti presenti nel territorio nazionale, indipendentemente dalla sede del fornitore.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔍</div>
+      <h3>Azione sul<br><em>Fronte IA</em></h3>
+      <p>Il Garante ha dimostrato un approccio proattivo verso i sistemi di IA: oltre al caso ChatGPT del 2023, ha avviato procedimenti nei confronti di Replika AI (chatbot emotivo), di sistemi di riconoscimento facciale in uso presso operatori privati e pubblici, e ha pubblicato specifiche linee guida sull'uso dell'IA nei sistemi HR e di scoring creditizio.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌐</div>
+      <h3>Cooperazione<br><em>Internazionale</em></h3>
+      <p>Il Garante partecipa attivamente all'European Data Protection Board (EDPB), il consesso delle autorità di protezione dei dati UE, e ai meccanismi di cooperazione e coerenza previsti dal GDPR. In materia di IA, coordina le proprie posizioni con le autorità di Francia, Germania, UK e Irlanda, spesso capofila per i procedimenti contro i grandi fornitori di tecnologia.</p>
+    </div>
+  </div>
+
+  <div class="content-grid" style="margin-top:64px;">
+    <div>
+      <h3>Il Caso<br><em>ChatGPT (2023)</em></h3>
+      <p>Il 31 marzo 2023 il Garante ha ordinato la limitazione provvisoria del trattamento dei dati degli utenti italiani da parte di OpenAI, sospendendo di fatto l'accesso a ChatGPT dall'Italia. Il provvedimento ha contestato: l'assenza di un'idonea base giuridica per la raccolta e il trattamento dei dati personali; la mancanza di sistemi di verifica dell'età che impedissero a minori di 13 anni l'accesso al servizio; una possibile violazione dei principi di trasparenza e correttezza.</p>
+      <p>Dopo un dialogo tra l'Autorità e OpenAI, il servizio è stato riattivato in Italia il 28 aprile 2023, con l'adozione da parte di OpenAI di misure quali: informativa agli utenti italiani, meccanismo opt-out per la formazione del modello, e sistema di verifica dell'età per i nuovi utenti.</p>
+    </div>
+    <div>
+      <h3>Provvedimenti<br><em>Recenti e Orientamenti</em></h3>
+      <p><strong style="color:var(--cream-dim)">Linee guida sull'IA negli HR (2022):</strong> Il Garante ha chiarito che i sistemi di IA per la selezione del personale che producono profilazioni o decisioni automatizzate devono rispettare il GDPR art. 22, garantendo supervisione umana e possibilità di contestazione.</p>
+      <p><strong style="color:var(--cream-dim)">Riconoscimento facciale (2022-2024):</strong> Numerosi provvedimenti hanno limitato l'uso di sistemi di riconoscimento facciale da parte di Comuni, forze dell'ordine e operatori privati, in assenza di una base normativa specifica nazionale.</p>
+      <p><strong style="color:var(--cream-dim)">Intelligenza artificiale generativa (2024):</strong> Il Garante ha avviato ispezioni nei confronti di diverse piattaforme di IA generativa, esaminando le politiche di privacy e le informative rese agli utenti italiani, con particolare attenzione alla base giuridica del trattamento dei dati per l'addestramento dei modelli.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── IMAGE: Palazzo della Consulta / Giustizia ── -->
+<div style="padding:0 8vw; border-top:1px solid var(--line); overflow:hidden;">
+  <div class="section-image" style="margin:0;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Palazzo_della_Consulta_-_Roma.jpg/1280px-Palazzo_della_Consulta_-_Roma.jpg" alt="Palazzo della Consulta, Roma" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=60'" />
+    <div class="section-image-caption">Roma — Sede istituzionale della Repubblica Italiana, cornice della legislazione sull'intelligenza artificiale</div>
+  </div>
+</div>
+
+<!-- ── 06 ITALIA ── -->
+<section class="section" id="italia">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title-wrap">
+      <div class="section-tag">Normativa Nazionale</div>
+      <h2>Evoluzione Legislativa<br>sull'IA in <em>Italia</em></h2>
+      <div class="divider"></div>
+    </div>
+  </div>
+
+  <div class="content-single">
+    <p>L'Italia si trova in una fase cruciale della propria evoluzione normativa in materia di intelligenza artificiale. Dopo anni di approccio prevalentemente basato sull'applicazione del GDPR e di atti di indirizzo non vincolanti, il Paese si è dotato nel 2024 di un quadro legislativo organico che, pur in attesa di definitiva approvazione parlamentare, segna una svolta significativa nella governance nazionale dell'IA.</p>
+  </div>
+
+  <div class="content-grid">
+    <div>
+      <h3>DDL Intelligenza Artificiale<br><em>(2024)</em></h3>
+      <p>Il Disegno di Legge sull'Intelligenza Artificiale, approvato dal Consiglio dei Ministri il 23 maggio 2024, rappresenta il più importante intervento legislativo italiano nel settore. Il DDL si articola su tre assi principali:</p>
+      <p><strong style="color:var(--cream-dim)">Promozione dell'IA:</strong> misure per favorire l'adozione di sistemi di IA nei settori della salute, del lavoro, della pubblica amministrazione e della sicurezza nazionale, con incentivi fiscali per le imprese che investono in IA responsabile.</p>
+      <p><strong style="color:var(--cream-dim)">Tutela dei diritti:</strong> disposizioni a protezione dei lavoratori coinvolti in processi decisionali automatizzati, con obbligo di informazione e diritto alla revisione umana delle decisioni che incidono sul rapporto di lavoro.</p>
+      <p><strong style="color:var(--cream-dim)">Norme penali e responsabilità:</strong> introduzione di fattispecie penali specifiche per l'uso fraudolento di sistemi di IA, con particolare riferimento alla creazione e diffusione di deepfake a scopo di frode o denigrazione.</p>
+    </div>
+    <div>
+      <h3>Struttura Istituzionale<br><em>per l'IA in Italia</em></h3>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-year">Agenzia per l'Italia Digitale (AgID)</div>
+          <p>Coordina le politiche digitali della PA e ha un ruolo di indirizzo nell'adozione di sistemi di IA nel settore pubblico, in attuazione delle Linee guida nazionali sull'IA nella PA.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">Presidenza del Consiglio — DIPE</div>
+          <p>Il Dipartimento per la programmazione e il coordinamento della politica economica coordina la Strategia Nazionale per l'IA, aggiornata nel 2024 con nuovi obiettivi al 2026 nell'ambito del PNRR.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">Fondazione FAIR</div>
+          <p>La Fondazione per l'Intelligenza Artificiale Responsabile, istituita nell'ambito del PNRR, coordina la ricerca sull'IA in Italia e sviluppa strumenti per la valutazione dell'impatto etico e sociale dei sistemi algoritmici.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">Autorità Nazionale AI (in fieri)</div>
+          <p>Il DDL IA prevede la designazione dell'Agenzia per la Cybersicurezza Nazionale (ACN) come Autorità Nazionale Competente per l'attuazione dell'AI Act, con compiti di vigilanza, registrazione e irrogazione di sanzioni.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-grid" style="margin-top:64px;">
+    <div class="card content-wide">
+      <h3>Intelligenza Artificiale nella<br><em>Pubblica Amministrazione Italiana</em></h3>
+      <p style="margin-bottom:1em;">Le Linee guida nazionali per l'adozione di sistemi di intelligenza artificiale nella PA, emanate da AgID nel 2023, impongono alle amministrazioni pubbliche che intendano adottare sistemi di IA di condurre una preventiva valutazione di impatto algoritmico, garantire la supervisione umana sulle decisioni automatizzate, prevedere meccanismi di ricorso per i cittadini e pubblicare informazioni accessibili sul funzionamento dei sistemi adottati.</p>
+      <p>Il PNRR italiano destina risorse significative alla digitalizzazione della PA, parte delle quali finanziano l'adozione di sistemi di IA per migliorare l'efficienza dei servizi pubblici. Questa accelerazione tecnologica rende ancora più urgente il completamento del quadro normativo nazionale.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── 07 DEEPFAKE ── -->
+<section class="section" id="deepfake">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title-wrap">
+      <div class="section-tag">Contrasto ai Contenuti Sintetici</div>
+      <h2>Contrasto al<br><em>Deepfake</em> da parte dell'UE</h2>
+      <div class="divider"></div>
+    </div>
+  </div>
+
+  <div class="content-single">
+    <p>I deepfake — contenuti audiovisivi generati o manipolati da sistemi di intelligenza artificiale in modo da far apparire persone reali mentre compiono azioni o pronunciano parole mai effettivamente compiute o pronunciate — rappresentano una delle sfide più urgenti poste dall'IA alla società democratica. L'Unione Europea ha affrontato il fenomeno attraverso un sistema normativo plurilivello.</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h3>AI Act — Obblighi di<br><em>Trasparenza</em></h3>
+      <p>L'AI Act (art. 50) impone ai fornitori di sistemi che generano contenuti sintetici — testi, immagini, audio, video — di marcare tecnicamente tali contenuti come artificialmente generati o manipolati, attraverso l'uso di soluzioni interoperabili come il watermarking digitale o i metadati C2PA (Coalition for Content Provenance and Authenticity).</p>
+      <p>I deployer di sistemi di IA che producono deepfake audiovisivi hanno l'obbligo di informare le persone ritratte nei contenuti che le immagini o le voci sono artificialmente generate, salvo nei casi in cui il contesto (es. opere d'arte, satira evidente) renda l'informazione superflua.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📡</div>
+      <h3>Digital Services Act<br><em>(DSA — Reg. 2022/2065)</em></h3>
+      <p>Il DSA impone alle piattaforme online — e in particolare alle Very Large Online Platforms (VLOP) come Facebook, YouTube, TikTok — di adottare misure specifiche per la gestione dei deepfake: etichettatura obbligatoria dei contenuti sintetici identificati, meccanismi di segnalazione accessibili agli utenti, e valutazioni annuali del rischio sistemico associato alla diffusione virale di deepfake disinformativi.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🗳️</div>
+      <h3>Elezioni e<br><em>Democrazia Digitale</em></h3>
+      <p>Il Regolamento (UE) 2024/900 sulla trasparenza e targeting delle pubblicità politiche introduce obblighi specifici per i contenuti politici generati o manipolati con IA: ogni contenuto politico che utilizzi tecniche di IA per alterare o sintetizzare voce, immagine o video di candidati o leader politici deve recare un'etichetta visibile e permanente. Questa norma è particolarmente rilevante in prossimità di elezioni.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔒</div>
+      <h3>CSAM e<br><em>Deepfake Sessuale</em></h3>
+      <p>La Proposta di Regolamento sulla prevenzione e il contrasto degli abusi sessuali su minori online (CSAM Regulation) — ancora in negoziazione — mira a rendere obbligatoria la rilevazione e segnalazione di materiale CSAM generato con IA. Contestualmente, la Direttiva sulla lotta agli abusi sessuali su minori (2011/93/UE) è in fase di revisione per includere esplicitamente il materiale generato da IA.</p>
+    </div>
+  </div>
+
+  <div class="content-grid" style="margin-top:64px;">
+    <div>
+      <h3>Deepfake e<br><em>Diritto Penale Italiano</em></h3>
+      <p>Il DDL IA italiano introduce l'art. 612-quater c.p. (inserimento proposto), che punisce con la reclusione da uno a cinque anni la creazione e diffusione non consensuale di deepfake audiovisivi di persone reali, a prescindere dal contenuto sessuale, quando compiuta con finalità di danno alla reputazione, al decoro, all'onore o alla privacy della persona ritratta.</p>
+      <p>Si aggiunge all'art. 612-ter c.p. già esistente ("revenge porn"), applicato dalla giurisprudenza anche ai deepfake a contenuto sessuale, e alle fattispecie di diffamazione aggravata dall'uso di mezzi telematici (art. 595 c.p.).</p>
+      <p>La tutela si estende anche al deepfake audio (voice cloning), rilevante per le frodi telefoniche e il furto d'identità, disciplinate dal codice penale agli artt. 493-ter e 640-ter.</p>
+    </div>
+    <div>
+      <h3>Sfide Tecniche e<br><em>Prospettive Future</em></h3>
+      <p><strong style="color:var(--cream-dim)">Provenienza e autenticità:</strong> lo standard C2PA (supportato da Adobe, Microsoft, Google, Sony) consente di incorporare metadati crittografati nei file multimediali per certificarne l'origine. Tuttavia, la norma UE sull'interoperabilità non ha ancora definito un formato tecnico unico obbligatorio.</p>
+      <p><strong style="color:var(--cream-dim)">Rilevazione automatica:</strong> i sistemi di rilevazione dei deepfake soffrono di un gap tecnologico rispetto ai sistemi di generazione: man mano che i generatori migliorano, i rilevatori faticano a stare al passo, rendendo necessario un approccio normativo che non faccia dipendere l'enforcement solo dalla tecnologia.</p>
+      <p><strong style="color:var(--cream-dim)">Equilibrio con la libertà d'espressione:</strong> la satira, la parodia e le opere d'arte che utilizzano tecniche di deepfake godono di protezione ai sensi dell'art. 11 della Carta dei Diritti Fondamentali UE. La norma deve trovare il giusto equilibrio tra prevenzione dei danni e tutela della libertà creativa.</p>
+    </div>
+  </div>
+
+  <div class="section-image" style="margin-top:64px;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Deepfake_example.jpg/1280px-Deepfake_example.jpg" alt="Esempio di deepfake" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1633265486064-086b219458ec?w=1200&q=60'" />
+    <div class="section-image-caption">Tecnologia deepfake — manipolazione audiovisiva generata da intelligenza artificiale</div>
+  </div>
+</section>
+
+<!-- ── IMAGE: Deepfake / Digital identity ── -->
+<div style="padding:0 8vw; border-top:1px solid var(--line); overflow:hidden;">
+  <div class="section-image" style="margin:0;">
+    <img src="https://images.unsplash.com/photo-1633265486064-086b219458ec?w=1400&q=70" alt="Intelligenza artificiale e identità digitale" loading="lazy" />
+    <div class="section-image-caption">Identità digitale e intelligenza artificiale generativa — la sfida del deepfake alla fiducia nell'informazione</div>
+  </div>
+</div>
+    <div class="meta-block">
+      <h4>Direzione Estetica: Luxury Editorial Minimal</h4>
+      <p>La scelta estetica è stata orientata verso un registro <em>luxury editorial minimal</em>: un linguaggio visivo che coniuga la serietà dell'argomento giuridico con un'eleganza raffinata, ispirata alle riviste di architettura e design di alto livello o ai report istituzionali delle grandi law firm internazionali.</p>
+      <p style="margin-top:1em;">Il tema scuro (dark mode by default) non è una scelta meramente estetica: riduce l'affaticamento visivo nella lettura di testi lunghi e densi, crea profondità percettiva e permette all'oro (#c8a96e) di emergere con forza come elemento gerarchico. L'oro non è usato come decorazione, ma come sistema di segnalazione: indica titoli, accenti, marcatori di timeline, bordi di quote, numeri di sezione — tutto ciò che merita attenzione prioritaria.</p>
+      <p style="margin-top:1em;">Un overlay di rumore SVG generato proceduralmente (via <code style="font-family:monospace;font-size:0.85em;color:var(--gold)">feTurbulence</code>) è applicato in posizione <code style="font-family:monospace;font-size:0.85em;color:var(--gold)">fixed</code> su tutto il documento con <code style="font-family:monospace;font-size:0.85em;color:var(--gold)">z-index: 9999</code> e <code style="font-family:monospace;font-size:0.85em;color:var(--gold)">pointer-events: none</code>. Questo strato impercettibile aggiunge una texture granulare che rompe la sterilità del flat design e conferisce al sito una qualità quasi tipografica, come carta di pregio stampata.</p>
+      <div class="color-swatches" style="margin-top:20px;">
+        <div class="swatch"><div class="swatch-dot" style="background:#0e0e0f;border:1px solid #333;"></div><span style="color:var(--text)">#0e0e0f — Sfondo principale</span></div>
+        <div class="swatch"><div class="swatch-dot" style="background:#141416;border:1px solid #333;"></div><span style="color:var(--text)">#141416 — Superfici secondarie</span></div>
+        <div class="swatch"><div class="swatch-dot" style="background:#1b1b1e;border:1px solid #333;"></div><span style="color:var(--text)">#1b1b1e — Card e componenti</span></div>
+        <div class="swatch"><div class="swatch-dot" style="background:#c8a96e;"></div><span style="color:var(--text)">#c8a96e — Oro principale (accenti)</span></div>
+        <div class="swatch"><div class="swatch-dot" style="background:#8a7048;"></div><span style="color:var(--text)">#8a7048 — Oro attenuato</span></div>
+        <div class="swatch"><div class="swatch-dot" style="background:#f0ead8;"></div><span style="color:var(--text)">#f0ead8 — Crema (testi primari)</span></div>
+        <div class="swatch"><div class="swatch-dot" style="background:#d8d2c4;"></div><span style="color:var(--text)">#d8d2c4 — Testo corpo</span></div>
+        <div class="swatch"><div class="swatch-dot" style="background:#6e6860;"></div><span style="color:var(--text)">#6e6860 — Testo attenuato/muted</span></div>
+      </div>
+    </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <p>IA &amp; Diritto — Intelligenza Artificiale nell'Ordinamento Giuridico Europeo</p>
+  <p>Contenuti aggiornati a maggio 2025 — Solo a scopo informativo</p>
+</footer>
+
+<script>
+  // Intersection Observer for section reveal
+  const sections = document.querySelectorAll('.section');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.07 });
+  sections.forEach(s => observer.observe(s));
+
+  // Mobile menu
+  function toggleMenu() {
+    document.getElementById('navLinks').classList.toggle('open');
+  }
+
+  // Close menu on link click (mobile)
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+      document.getElementById('navLinks').classList.remove('open');
+    });
+  });
+
+  // Nav active state
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+      if (window.scrollY >= section.offsetTop - 100) {
+        current = section.getAttribute('id');
+      }
+    });
+    navLinks.forEach(link => {
+      link.style.color = link.getAttribute('href') === '#' + current
+        ? 'var(--gold)' : '';
+    });
+  });
+</script>
+</body>
+</html>

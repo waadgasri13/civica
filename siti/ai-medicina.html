@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI & Medicina — Il Futuro della Cura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #080c14;
+  --paper: #f7f4ee;
+  --cream: #f0ece3;
+  --accent: #b83520;
+  --teal: #0f5a5a;
+  --teal-light: #1a7a7a;
+  --gold: #c49a2a;
+  --gold-light: #e8c060;
+  --mid: #5a5a6e;
+  --rule: rgba(8,12,20,0.1);
+  --rule-light: rgba(8,12,20,0.06);
+  --white-alpha: rgba(247,244,238,0.07);
+  --white-alpha-border: rgba(247,244,238,0.18);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+/* GRAIN OVERLAY */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 4rem;
+  border-bottom: 1px solid var(--rule);
+  background: rgba(247,244,238,0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.nav-logo .dot { color: var(--accent); font-size: 1.6rem; line-height: 0; }
+
+.nav-links {
+  display: flex;
+  gap: 2.8rem;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mid);
+  text-decoration: none;
+  transition: color 0.2s;
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -3px; left: 0;
+  width: 0; height: 1px;
+  background: var(--accent);
+  transition: width 0.3s;
+}
+.nav-links a:hover { color: var(--ink); }
+.nav-links a:hover::after { width: 100%; }
+
+.nav-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--accent);
+  color: white;
+  padding: 0.25rem 0.8rem;
+  border-radius: 2px;
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 55% 45%;
+  padding-top: 5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6rem 5rem 6rem 7rem;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: block;
+  width: 2.5rem;
+  height: 1px;
+  background: var(--accent);
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3.5rem, 6vw, 6rem);
+  line-height: 1.02;
+  font-weight: 700;
+  margin-bottom: 2.2rem;
+  letter-spacing: -0.01em;
+}
+.hero-title em { font-style: italic; color: var(--teal); }
+.hero-title .outline {
+  -webkit-text-stroke: 1.5px var(--ink);
+  color: transparent;
+}
+
+.hero-sub {
+  font-size: 1.05rem;
+  color: var(--mid);
+  max-width: 32rem;
+  line-height: 1.8;
+  margin-bottom: 3rem;
+  font-weight: 300;
+}
+
+.hero-cta-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 3.5rem;
+  flex-wrap: wrap;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--teal);
+  color: var(--paper);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.85rem 1.8rem;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background 0.2s, transform 0.2s;
+}
+.btn-primary:hover { background: var(--teal-light); transform: translateY(-1px); }
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.85rem 1.8rem;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background 0.2s, transform 0.2s;
+}
+.btn-outline:hover { background: var(--ink); color: var(--paper); }
+
+.hero-stat-row {
+  display: flex;
+  gap: 0;
+  border-top: 1px solid var(--rule);
+}
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1.5rem 2rem 0 0;
+  margin-right: 2rem;
+  border-right: 1px solid var(--rule);
+  padding-right: 2rem;
+}
+.hero-stat:last-child { border-right: none; }
+.hero-stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+}
+.hero-stat-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mid);
+  max-width: 10rem;
+  line-height: 1.4;
+}
+
+/* Hero Right */
+.hero-right {
+  position: relative;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+.hero-art-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(15,90,90,0.5) 0%, transparent 65%),
+              radial-gradient(ellipse at 80% 20%, rgba(184,53,32,0.25) 0%, transparent 50%),
+              var(--ink);
+}
+
+.hero-rings {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hero-rings svg {
+  width: 80%;
+  height: 80%;
+  animation: slow-spin 30s linear infinite;
+}
+@keyframes slow-spin { to { transform: rotate(360deg); } }
+
+.hero-card-stack {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 1px;
+  padding: 5rem 2.5rem 3rem;
+}
+.hero-card {
+  background: rgba(247,244,238,0.055);
+  border: 1px solid rgba(247,244,238,0.12);
+  padding: 1.5rem 1.8rem;
+  color: var(--paper);
+  width: 100%;
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transform: translateX(30px);
+  animation: card-enter 0.7s ease forwards;
+  position: relative;
+  overflow: hidden;
+}
+.hero-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+}
+.hero-card:nth-child(1) { animation-delay: 0.3s; }
+.hero-card:nth-child(1)::before { background: var(--accent); }
+.hero-card:nth-child(2) { animation-delay: 0.5s; }
+.hero-card:nth-child(2)::before { background: var(--gold); }
+.hero-card:nth-child(3) { animation-delay: 0.7s; }
+.hero-card:nth-child(3)::before { background: var(--teal-light); }
+.hero-card:nth-child(4) { animation-delay: 0.9s; }
+.hero-card:nth-child(4)::before { background: #7a6bb0; }
+@keyframes card-enter { to { opacity: 1; transform: translateX(0); } }
+
+.hero-card-tag {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(247,244,238,0.45);
+  margin-bottom: 0.4rem;
+}
+.hero-card-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.hero-card-desc { font-size: 0.78rem; color: rgba(247,244,238,0.6); margin-top: 0.25rem; line-height: 1.5; }
+
+/* ── NUMBERS BAR ── */
+.numbers-bar {
+  background: var(--teal);
+  color: var(--paper);
+  padding: 4rem 7rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  position: relative;
+  overflow: hidden;
+}
+.numbers-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(196,154,42,0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+.nb-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0 2rem;
+  border-right: 1px solid rgba(247,244,238,0.12);
+  position: relative;
+  z-index: 1;
+}
+.nb-item:first-child { padding-left: 0; }
+.nb-item:last-child { border-right: none; }
+.nb-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--gold-light);
+}
+.nb-label {
+  font-size: 0.73rem;
+  letter-spacing: 0.06em;
+  color: rgba(247,244,238,0.55);
+  line-height: 1.45;
+  max-width: 12rem;
+}
+
+/* ── TIMELINE SECTION ── */
+.timeline-section {
+  padding: 8rem 7rem;
+  background: var(--paper);
+  position: relative;
+  overflow: hidden;
+}
+.timeline-section::after {
+  content: '2024';
+  position: absolute;
+  right: -1rem;
+  top: 3rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16rem;
+  font-weight: 700;
+  color: var(--rule-light);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.timeline {
+  position: relative;
+  margin-top: 4rem;
+  padding-left: 3rem;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0.6rem;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--teal), var(--gold), var(--accent), transparent);
+}
+.tl-item {
+  position: relative;
+  padding: 0 0 3.5rem 3rem;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.tl-item.visible { opacity: 1; transform: translateX(0); }
+.tl-item:nth-child(2) { transition-delay: 0.1s; }
+.tl-item:nth-child(3) { transition-delay: 0.2s; }
+.tl-item:nth-child(4) { transition-delay: 0.3s; }
+.tl-item:nth-child(5) { transition-delay: 0.4s; }
+.tl-item:last-child { padding-bottom: 0; }
+
+.tl-dot {
+  position: absolute;
+  left: -2.5rem;
+  top: 0.3rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tl-dot::after {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--teal);
+}
+.tl-item:nth-child(2) .tl-dot { border-color: var(--gold); }
+.tl-item:nth-child(2) .tl-dot::after { background: var(--gold); }
+.tl-item:nth-child(3) .tl-dot { border-color: var(--accent); }
+.tl-item:nth-child(3) .tl-dot::after { background: var(--accent); }
+.tl-item:nth-child(4) .tl-dot { border-color: #7a6bb0; }
+.tl-item:nth-child(4) .tl-dot::after { background: #7a6bb0; }
+.tl-item:nth-child(5) .tl-dot { border-color: var(--teal-light); }
+.tl-item:nth-child(5) .tl-dot::after { background: var(--teal-light); }
+
+.tl-year {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+.tl-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+.tl-text {
+  font-size: 0.88rem;
+  color: var(--mid);
+  max-width: 52rem;
+  line-height: 1.75;
+}
+.tl-tag {
+  display: inline-block;
+  margin-top: 0.8rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(15,90,90,0.08);
+  color: var(--teal);
+  border: 1px solid rgba(15,90,90,0.2);
+  padding: 0.2rem 0.7rem;
+  border-radius: 2px;
+}
+
+/* ── APPLICATIONS ── */
+.applications {
+  background: var(--cream);
+  padding: 8rem 7rem;
+}
+
+.section-label {
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+.section-label::before {
+  content: '';
+  display: block;
+  width: 2rem;
+  height: 1px;
+  background: var(--accent);
+}
+
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.2rem, 3.8vw, 3.2rem);
+  line-height: 1.12;
+  font-weight: 700;
+  max-width: 44rem;
+  margin-bottom: 1.4rem;
+  letter-spacing: -0.01em;
+}
+.section-intro {
+  color: var(--mid);
+  max-width: 52rem;
+  font-size: 1rem;
+  line-height: 1.85;
+  margin-bottom: 4rem;
+}
+
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5px;
+  background: var(--rule);
+  border: 1.5px solid var(--rule);
+}
+.app-card {
+  background: var(--cream);
+  padding: 2.6rem 2.2rem;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+.app-card:hover { background: #e8e3d8; }
+.app-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: transparent;
+  transition: background 0.4s;
+}
+.app-card:hover::before { background: var(--teal); }
+
+.app-icon { font-size: 2rem; margin-bottom: 1.4rem; display: block; }
+.app-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  line-height: 1.2;
+}
+.app-card-text {
+  font-size: 0.86rem;
+  color: var(--mid);
+  line-height: 1.75;
+}
+.app-card-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 1.2rem;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--teal);
+  text-decoration: none;
+}
+.app-card-source::after { content: '→'; }
+.app-card-source:hover { color: var(--teal-light); }
+
+/* ── DEEP DIVE: DIAGNOSTICA ── */
+.diagnostics-section {
+  padding: 8rem 7rem;
+  background: var(--paper);
+}
+.diag-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6rem;
+  align-items: start;
+  margin-top: 4rem;
+}
+.diag-study-list { display: flex; flex-direction: column; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.diag-study {
+  background: var(--paper);
+  padding: 1.6rem 1.8rem;
+  transition: background 0.2s;
+  position: relative;
+}
+.diag-study:hover { background: var(--cream); }
+.diag-study::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--teal);
+  transform: scaleY(0);
+  transition: transform 0.3s;
+  transform-origin: top;
+}
+.diag-study:hover::before { transform: scaleY(1); }
+.diag-study-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.diag-study-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.diag-study-stat {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--teal);
+  white-space: nowrap;
+  line-height: 1;
+}
+.diag-study-text { font-size: 0.82rem; color: var(--mid); line-height: 1.65; }
+
+.diag-visual {
+  background: var(--ink);
+  border-radius: 3px;
+  padding: 3rem;
+  color: var(--paper);
+  position: relative;
+  overflow: hidden;
+}
+.diag-visual::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top right, rgba(15,90,90,0.4), transparent 60%);
+}
+.diag-visual-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+.bar-chart { display: flex; flex-direction: column; gap: 1.2rem; position: relative; z-index: 1; }
+.bar-row { display: flex; flex-direction: column; gap: 0.4rem; }
+.bar-label-row { display: flex; justify-content: space-between; }
+.bar-label { font-size: 0.75rem; color: rgba(247,244,238,0.7); }
+.bar-value { font-size: 0.75rem; font-weight: 600; color: var(--gold-light); }
+.bar-track {
+  height: 8px;
+  background: rgba(247,244,238,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--teal-light);
+  animation: bar-grow 1.2s ease forwards;
+  width: 0;
+}
+.bar-fill.gold { background: var(--gold); }
+.bar-fill.accent { background: var(--accent); }
+@keyframes bar-grow { to { width: var(--w); } }
+
+/* ── NUMBERS CALLOUT ── */
+.numbers-bar-2 {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 4.5rem 7rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border-top: 3px solid var(--accent);
+  position: relative;
+  overflow: hidden;
+}
+.numbers-bar-2::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 20% 50%, rgba(15,90,90,0.2), transparent 50%);
+  pointer-events: none;
+}
+.nb2-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0 2.5rem;
+  border-right: 1px solid rgba(247,244,238,0.08);
+  position: relative;
+  z-index: 1;
+}
+.nb2-item:first-child { padding-left: 0; }
+.nb2-item:last-child { border-right: none; }
+.nb2-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--gold-light);
+}
+.nb2-label {
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  color: rgba(247,244,238,0.45);
+  line-height: 1.45;
+  max-width: 13rem;
+}
+
+/* ── DIABETES ── */
+.diabetes {
+  background: var(--teal);
+  color: var(--paper);
+  padding: 8rem 7rem;
+  position: relative;
+  overflow: hidden;
+}
+.diabetes::after {
+  content: 'T1D';
+  position: absolute;
+  right: -2rem;
+  bottom: -4rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.035);
+  line-height: 1;
+  pointer-events: none;
+}
+.diabetes .section-label { color: var(--gold-light); }
+.diabetes .section-label::before { background: var(--gold-light); }
+.diabetes .section-title { color: var(--paper); }
+.diabetes .section-intro { color: rgba(247,244,238,0.7); }
+
+.diabetes-cols {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 5rem;
+  align-items: start;
+  position: relative;
+  z-index: 1;
+  margin-top: 4rem;
+}
+
+.pancreas-diagram {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 3px;
+  padding: 2.8rem;
+}
+.pd-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: var(--gold-light);
+}
+.pd-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.3rem;
+  padding: 1.3rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.pd-step:last-child { border-bottom: none; }
+.pd-num {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+.pd-step-title { font-size: 0.9rem; font-weight: 500; margin-bottom: 0.3rem; color: var(--paper); }
+.pd-step-desc { font-size: 0.8rem; color: rgba(247,244,238,0.58); line-height: 1.65; }
+
+.diabetes-features { display: flex; flex-direction: column; gap: 1rem; }
+.df-item {
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 3px;
+  padding: 1.7rem 1.9rem;
+  transition: background 0.3s, border-color 0.3s;
+}
+.df-item:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.22); }
+.df-item-head { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem; }
+.df-icon { font-size: 1.2rem; }
+.df-item-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--paper);
+}
+.df-item-text { font-size: 0.83rem; color: rgba(247,244,238,0.62); line-height: 1.68; }
+.df-source {
+  display: inline-block;
+  margin-top: 0.7rem;
+  font-size: 0.63rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(232,192,96,0.35);
+  transition: border-color 0.2s;
+}
+.df-source:hover { border-color: var(--gold-light); }
+
+/* ── RESEARCH SPOTLIGHT ── */
+.research-section {
+  padding: 8rem 7rem;
+  background: var(--cream);
+}
+.research-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin-top: 4rem;
+}
+.research-card {
+  background: var(--cream);
+  padding: 2.8rem;
+  transition: background 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.research-card:hover { background: #e4dfd4; }
+.research-card-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4rem;
+  font-weight: 700;
+  color: var(--rule);
+  line-height: 1;
+  margin-bottom: 1rem;
+  transition: color 0.3s;
+}
+.research-card:hover .research-card-num { color: rgba(8,12,20,0.07); }
+.research-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  line-height: 1.25;
+}
+.research-card-text { font-size: 0.85rem; color: var(--mid); line-height: 1.75; }
+.research-card-journal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.2rem;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--teal);
+  padding: 0.25rem 0.7rem;
+  border: 1px solid rgba(15,90,90,0.25);
+  border-radius: 2px;
+  background: rgba(15,90,90,0.06);
+}
+
+/* ── FUTURE / ROADMAP ── */
+.future-section {
+  padding: 8rem 7rem;
+  background: var(--ink);
+  color: var(--paper);
+  position: relative;
+  overflow: hidden;
+}
+.future-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 80% 30%, rgba(196,154,42,0.1), transparent 50%),
+              radial-gradient(ellipse at 10% 80%, rgba(15,90,90,0.2), transparent 50%);
+  pointer-events: none;
+}
+.future-section .section-label { color: var(--gold-light); }
+.future-section .section-label::before { background: var(--gold-light); }
+.future-section .section-title { color: var(--paper); }
+.future-section .section-intro { color: rgba(247,244,238,0.6); }
+
+.future-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5px;
+  background: rgba(247,244,238,0.07);
+  border: 1px solid rgba(247,244,238,0.07);
+  margin-top: 4rem;
+  position: relative;
+  z-index: 1;
+}
+.future-card {
+  background: rgba(8,12,20,0.5);
+  padding: 2.6rem 2.2rem;
+  transition: background 0.3s;
+  position: relative;
+}
+.future-card:hover { background: rgba(247,244,238,0.04); }
+.future-card-year {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: rgba(247,244,238,0.08);
+  margin-bottom: 1rem;
+  transition: color 0.3s;
+}
+.future-card:hover .future-card-year { color: rgba(247,244,238,0.12); }
+.future-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  margin-bottom: 0.8rem;
+  line-height: 1.2;
+}
+.future-card-text { font-size: 0.84rem; color: rgba(247,244,238,0.55); line-height: 1.72; }
+.future-card-status {
+  display: inline-block;
+  margin-top: 1.2rem;
+  font-size: 0.63rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.65rem;
+  border-radius: 2px;
+}
+.status-active { background: rgba(15,90,90,0.3); color: #4dd4ac; border: 1px solid rgba(77,212,172,0.3); }
+.status-emerging { background: rgba(196,154,42,0.15); color: var(--gold-light); border: 1px solid rgba(196,154,42,0.3); }
+.status-horizon { background: rgba(122,107,176,0.15); color: #b8a8e8; border: 1px solid rgba(122,107,176,0.3); }
+
+/* ── CHALLENGES ── */
+.challenges {
+  background: var(--paper);
+  padding: 8rem 7rem;
+}
+.ch-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+}
+.ch-card {
+  padding: 2.2rem;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  position: relative;
+  transition: background 0.3s;
+}
+.ch-card:hover { background: var(--cream); }
+.ch-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 3px;
+}
+.ch-card:nth-child(1)::before { background: var(--accent); }
+.ch-card:nth-child(2)::before { background: var(--teal); }
+.ch-card:nth-child(3)::before { background: var(--gold); }
+.ch-card:nth-child(4)::before { background: #7a6bb0; }
+.ch-card:nth-child(5)::before { background: var(--mid); }
+.ch-card:nth-child(6)::before { background: var(--teal-light); }
+.ch-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.7rem;
+  line-height: 1.25;
+}
+.ch-card-text { font-size: 0.85rem; color: var(--mid); line-height: 1.72; }
+
+/* ── SOURCES ── */
+.sources {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 6rem 7rem;
+}
+.sources .section-label { color: var(--gold-light); }
+.sources .section-label::before { background: var(--gold-light); }
+.sources .section-title { color: var(--paper); font-size: 1.8rem; }
+
+.sources-list {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: rgba(247,244,238,0.05);
+}
+.source-item {
+  display: grid;
+  grid-template-columns: 2.8rem 1fr auto;
+  gap: 1.5rem;
+  align-items: start;
+  padding: 1.4rem 2rem;
+  background: rgba(8,12,20,0.5);
+  text-decoration: none;
+  color: var(--paper);
+  transition: background 0.2s;
+}
+.source-item:hover { background: rgba(247,244,238,0.04); }
+.source-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  padding-top: 0.1rem;
+}
+.source-text { display: flex; flex-direction: column; gap: 0.25rem; }
+.source-title { font-size: 0.88rem; font-weight: 500; line-height: 1.45; }
+.source-meta { font-size: 0.7rem; color: rgba(247,244,238,0.38); }
+.source-tag {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(196,154,42,0.12);
+  color: var(--gold-light);
+  border: 1px solid rgba(196,154,42,0.28);
+  padding: 0.2rem 0.65rem;
+  border-radius: 2px;
+  white-space: nowrap;
+  align-self: start;
+}
+
+/* ── FOOTER ── */
+footer {
+  background: rgba(4,8,12,0.95);
+  color: rgba(247,244,238,0.3);
+  padding: 2.2rem 7rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.73rem;
+}
+.footer-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--paper);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.footer-brand .dot { color: var(--gold-light); }
+
+/* ── SCROLL ANIMATIONS ── */
+.fade-up {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.fade-up.visible { opacity: 1; transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1000px) {
+  nav { padding: 1rem 2rem; }
+  .nav-links { display: none; }
+  .hero { grid-template-columns: 1fr; }
+  .hero-left { padding: 7rem 2rem 3rem; }
+  .hero-right { min-height: 320px; }
+  .numbers-bar, .numbers-bar-2 { grid-template-columns: 1fr 1fr; padding: 3rem 2rem; }
+  .nb-item, .nb2-item { padding: 1.5rem 1rem; border-right: none; border-bottom: 1px solid rgba(247,244,238,0.08); }
+  .timeline-section, .applications, .diagnostics-section, .research-section, .future-section, .challenges, .sources { padding: 5rem 2rem; }
+  .diabetes { padding: 5rem 2rem; }
+  .app-grid { grid-template-columns: 1fr; }
+  .diag-split, .diabetes-cols, .ch-grid, .research-grid, .future-grid { grid-template-columns: 1fr; }
+  footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.5rem 2rem; }
+  .timeline-section::after { font-size: 8rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#"><span class="dot">◆</span> AI & Medicina</a>
+  <ul class="nav-links">
+    <li><a href="#applicazioni">Applicazioni</a></li>
+    <li><a href="#diagnostica">Diagnostica</a></li>
+    <li><a href="#diabete">Diabete T1</a></li>
+    <li><a href="#ricerca">Ricerca</a></li>
+    <li><a href="#futuro">Futuro</a></li>
+    <li><a href="#sfide">Sfide</a></li>
+    <li><a href="#fonti">Fonti</a></li>
+  </ul>
+  <span class="nav-badge">2026</span>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-eyebrow">Intelligenza Artificiale in Medicina</p>
+    <h1 class="hero-title">
+      La Cura<br>
+      nell'Era<br>
+      <em>dell'IA</em>
+    </h1>
+    <p class="hero-sub">
+      L'intelligenza artificiale sta trasformando ogni aspetto della medicina moderna — dalla diagnosi precoce alla personalizzazione delle terapie, dalla scoperta di farmaci alla gestione cronica delle malattie — aprendo scenari impensabili solo pochi anni fa.
+    </p>
+    <div class="hero-cta-row">
+      <a href="#applicazioni" class="btn-primary">Esplora le Applicazioni</a>
+      <a href="#fonti" class="btn-outline">Vedi le Fonti</a>
+    </div>
+    <div class="hero-stat-row">
+      <div class="hero-stat">
+        <span class="hero-stat-num">$36B</span>
+        <span class="hero-stat-label">Mercato globale AI Sanità 2033</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">70%</span>
+        <span class="hero-stat-label">Medici che usano AI nel 2024</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">+28%</span>
+        <span class="hero-stat-label">CAGR previsto 2025–2033</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-art-bg"></div>
+    <div class="hero-rings">
+      <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="150" cy="150" r="140" stroke="rgba(247,244,238,0.06)" stroke-width="1"/>
+        <circle cx="150" cy="150" r="110" stroke="rgba(247,244,238,0.06)" stroke-width="1" stroke-dasharray="6 6"/>
+        <circle cx="150" cy="150" r="80" stroke="rgba(247,244,238,0.08)" stroke-width="1"/>
+        <circle cx="150" cy="150" r="50" stroke="rgba(247,244,238,0.1)" stroke-width="1" stroke-dasharray="3 5"/>
+        <circle cx="150" cy="150" r="20" stroke="rgba(247,244,238,0.15)" stroke-width="1"/>
+        <line x1="10" y1="150" x2="290" y2="150" stroke="rgba(247,244,238,0.04)" stroke-width="1"/>
+        <line x1="150" y1="10" x2="150" y2="290" stroke="rgba(247,244,238,0.04)" stroke-width="1"/>
+        <circle cx="150" cy="10" r="4" fill="rgba(196,154,42,0.6)"/>
+        <circle cx="290" cy="150" r="4" fill="rgba(15,90,90,0.8)"/>
+        <circle cx="150" cy="290" r="4" fill="rgba(184,53,32,0.6)"/>
+        <circle cx="10" cy="150" r="4" fill="rgba(247,244,238,0.3)"/>
+        <circle cx="257" cy="57" r="3" fill="rgba(247,244,238,0.2)"/>
+        <circle cx="57" cy="243" r="3" fill="rgba(247,244,238,0.2)"/>
+      </svg>
+    </div>
+    <div class="hero-card-stack">
+      <div class="hero-card">
+        <div class="hero-card-tag">Diagnostica per Immagini</div>
+        <div class="hero-card-val">85%+</div>
+        <div class="hero-card-desc">Sensibilità AI nella diagnosi mammografica (Nature Medicine, 2024)</div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-tag">Oncologia — ScreenTrustMRI</div>
+        <div class="hero-card-val">64 / 1.000 RM</div>
+        <div class="hero-card-desc">Tumori rilevati con IA vs 16,5 senza, su larga scala (AIRC, 2024)</div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-tag">Mercato Globale 2025</div>
+        <div class="hero-card-val">$4,9 Mld</div>
+        <div class="hero-card-desc">Stima valore mercato AI in sanità per il 2025</div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-tag">Risparmio Amministrativo</div>
+        <div class="hero-card-val">40–50%</div>
+        <div class="hero-card-desc">Quota del tempo medico USA assorbita da pratiche burocratiche (GeoPop)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NUMBERS BAR -->
+<div class="numbers-bar">
+  <div class="nb-item">
+    <span class="nb-num" data-target="3813" data-suffix="M" data-prefix="$">$3,8B</span>
+    <span class="nb-label">Valore mercato AI Sanità nel 2024</span>
+  </div>
+  <div class="nb-item">
+    <span class="nb-num" data-target="25" data-suffix="%" data-prefix="">25%</span>
+    <span class="nb-label">Ospedali USA che usano AI per analisi predittiva del rischio</span>
+  </div>
+  <div class="nb-item">
+    <span class="nb-num" data-target="40" data-suffix="%" data-prefix="">40%</span>
+    <span class="nb-label">Quota di mercato USA sul totale globale AI Sanità</span>
+  </div>
+  <div class="nb-item">
+    <span class="nb-num" data-target="64" data-suffix="" data-prefix="">64</span>
+    <span class="nb-label">Tumori ogni 1.000 RM rilevati con AI vs 16,5 senza (AIRC)</span>
+  </div>
+  <div class="nb-item">
+    <span class="nb-num" data-target="100" data-suffix="K+" data-prefix="">100K+</span>
+    <span class="nb-label">Donne coinvolte negli studi AI mammografici in Svezia, Germania e USA</span>
+  </div>
+</div>
+
+<!-- TIMELINE -->
+<section class="timeline-section" id="timeline">
+  <div class="section-label">Evoluzione Storica</div>
+  <h2 class="section-title fade-up">Tappe fondamentali dell'AI in Medicina</h2>
+  <p class="section-intro fade-up">Dal laboratorio alla clinica: i momenti chiave che hanno trasformato l'intelligenza artificiale da promessa teorica a strumento di cura quotidiano.</p>
+  <div class="timeline">
+    <div class="tl-item fade-up">
+      <div class="tl-dot"></div>
+      <div class="tl-year">1972</div>
+      <h3 class="tl-title">MYCIN — Il Primo Sistema Esperto in Medicina</h3>
+      <p class="tl-text">Sviluppato a Stanford, MYCIN era un sistema a regole per la diagnosi di infezioni batteriche e la raccomandazione di antibiotici. Pur non entrando mai in uso clinico per ragioni etiche e pratiche, dimostrò per la prima volta che una macchina poteva ragionare in modo comparabile a un medico esperto in un dominio circoscritto.</p>
+      <span class="tl-tag">Origini</span>
+    </div>
+    <div class="tl-item fade-up">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2016</div>
+      <h3 class="tl-title">DeepMind Supera i Dermatologi nel Riconoscimento del Melanoma</h3>
+      <p class="tl-text">La rete neurale convoluzionale di Google DeepMind, addestrata su oltre 129.000 immagini dermatologiche, classificò carcinomi cutanei con accuratezza pari o superiore a 21 dermatologi board-certified. Pubblicato su <em>Nature</em>, questo studio segnò un punto di svolta nella percezione pubblica e scientifica del potenziale diagnostico dell'AI.</p>
+      <span class="tl-tag">Deep Learning</span>
+    </div>
+    <div class="tl-item fade-up">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2019</div>
+      <h3 class="tl-title">AlphaFold e la Rivoluzione della Biologia Strutturale</h3>
+      <p class="tl-text">DeepMind presenta AlphaFold al concorso CASP13, raggiungendo un'accuratezza senza precedenti nella previsione della struttura tridimensionale delle proteine. Nel 2021, AlphaFold 2 determina la struttura di quasi tutte le proteine conosciute, mettendo a disposizione dei ricercatori un database di oltre 200 milioni di strutture e accelerando enormemente la drug discovery.</p>
+      <span class="tl-tag">Drug Discovery</span>
+    </div>
+    <div class="tl-item fade-up">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2022–2023</div>
+      <h3 class="tl-title">LLM in Medicina: GPT-4 e i Foundation Models Clinici</h3>
+      <p class="tl-text">I grandi modelli linguistici mostrano prestazioni da medico esperto nei test USMLE (esame di licenza medica USA), aprendo nuovi scenari per l'assistenza clinica, la redazione di note mediche e il supporto diagnostico. Google med-PaLM 2 e Microsoft/OpenAI stringono partnership con i principali sistemi ospedalieri globali. L'integrazione nei flussi di lavoro clinici diventa un tema urgente per ospedali e regulators.</p>
+      <span class="tl-tag">AI Generativa</span>
+    </div>
+    <div class="tl-item fade-up">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2024–2025</div>
+      <h3 class="tl-title">AI Approvata nei Protocolli Clinici Standard</h3>
+      <p class="tl-text">La FDA approva oltre 700 dispositivi medici basati su AI. Il NHS britannico introduce su larga scala il pancreas artificiale per il diabete T1. Studi con oltre 100.000 pazienti confermano il vantaggio dell'AI nello screening oncologico mammario. Il 70% dei medici a livello globale dichiara di utilizzare strumenti AI nella pratica quotidiana.</p>
+      <span class="tl-tag">Adozione Istituzionale</span>
+    </div>
+  </div>
+</section>
+
+<!-- APPLICATIONS -->
+<section class="applications" id="applicazioni">
+  <div class="section-label">Aree di Impatto</div>
+  <h2 class="section-title fade-up">Dove l'intelligenza artificiale sta rivoluzionando la medicina</h2>
+  <p class="section-intro fade-up">Dall'analisi delle immagini diagnostiche alla drug discovery, l'AI penetra in ogni strato del sistema sanitario, migliorando accuratezza, velocità e personalizzazione delle cure.</p>
+  <div class="app-grid">
+    <div class="app-card fade-up">
+      <span class="app-icon">🧬</span>
+      <h3 class="app-card-title">Diagnostica per Immagini</h3>
+      <p class="app-card-text">Sistemi AI analizzano radiografie, risonanze e TAC con sensibilità superiore all'85% nella diagnosi mammografica, riducendo i falsi positivi e alleggerendo il carico dei radiologi. Studi in Svezia (100.000 donne), Germania e USA confermano miglioramenti significativi negli screening oncologici. Il progetto ScreenTrustMRI ha rilevato 64 tumori per 1.000 RM contro i 16,5 dei metodi standard.</p>
+      <a class="app-card-source" href="https://www.airc.it/cancro/informazioni-tumori/corretta-informazione/intelligenza-artificiale-diagnosi-tumori" target="_blank">AIRC — Lancet Digital Health</a>
+    </div>
+    <div class="app-card fade-up">
+      <span class="app-icon">💊</span>
+      <h3 class="app-card-title">Drug Discovery & Sviluppo Farmaci</h3>
+      <p class="app-card-text">Gli algoritmi di machine learning analizzano enormi database molecolari per identificare nuovi bersagli farmacologici e accelerare il ciclo di sviluppo. AlphaFold 2 ha messo a disposizione la struttura di oltre 200 milioni di proteine, rivoluzionando la biologia strutturale. Aziende come Insilico Medicine e Recursion Pharmaceuticals usano AI generativa per progettare molecole <em>de novo</em>, portando candidati farmaci dalle fasi iniziali alla sperimentazione clinica in tempi record.</p>
+      <a class="app-card-source" href="https://www.geopop.it/intelligenza-artificiale-in-medicina-quali-sono-gli-utilizzi-e-gli-sviluppi-futuri/" target="_blank">GeoPop — Applicazioni IA</a>
+    </div>
+    <div class="app-card fade-up">
+      <span class="app-icon">🦠</span>
+      <h3 class="app-card-title">Epidemiologia e Sorveglianza Pandemica</h3>
+      <p class="app-card-text">Durante il Covid-19, vaiolo delle scimmie e influenza aviaria H5N1, l'AI ha identificato focolai prima che si diffondessero, monitorato varianti virali e ottimizzato la distribuzione delle risorse. Sistemi come BlueDot e Metabiota processano milioni di segnali digitali giornalieri — dati di volo, social media, report sanitari — per prevedere traiettorie epidemiche con anticipo rispetto ai sistemi di sorveglianza tradizionali.</p>
+      <a class="app-card-source" href="https://www.fortuneita.com/2024/12/31/ai-in-medicina-il-2024-e-stato-solo-linizio/" target="_blank">Fortune Italia, Dic. 2024</a>
+    </div>
+    <div class="app-card fade-up">
+      <span class="app-icon">🏥</span>
+      <h3 class="app-card-title">Gestione Clinica e Documentazione</h3>
+      <p class="app-card-text">Negli USA il 40–50% del tempo medico è assorbito da attività amministrative e documentali. I software AI analizzano le cartelle cliniche elettroniche (EHR) per identificare pazienti a rischio, suggerire opzioni terapeutiche personalizzate e generare automaticamente note cliniche dalle trascrizioni audio delle visite. Epic e Oracle Health integrano modelli linguistici nei loro sistemi usati da milioni di pazienti.</p>
+      <a class="app-card-source" href="https://www.geopop.it/intelligenza-artificiale-in-medicina-quali-sono-gli-utilizzi-e-gli-sviluppi-futuri/" target="_blank">GeoPop — Studio USA</a>
+    </div>
+    <div class="app-card fade-up">
+      <span class="app-icon">🔬</span>
+      <h3 class="app-card-title">Medicina di Precisione e Genomica</h3>
+      <p class="app-card-text">L'AI analizza dati genomici, proteomici e del microbioma per personalizzare le terapie oncologiche e identificare predisposizioni genetiche a malattie rare. Piattaforme come Tempus e Foundation Medicine processano migliaia di profili tumorali per abbinare pazienti ai trial clinici più adatti. Il sequenziamento del genoma intero (WGS) con interpretazione AI sta riducendo drasticamente i tempi di diagnosi per le malattie genetiche rare.</p>
+      <a class="app-card-source" href="https://www.latestatamagazine.it/2026/02/lintelligenza-artificiale-in-medicina-una-rivoluzione-concreta/" target="_blank">La Testata Magazine, 2026</a>
+    </div>
+    <div class="app-card fade-up">
+      <span class="app-icon">🤖</span>
+      <h3 class="app-card-title">Chirurgia Robotica Assistita</h3>
+      <p class="app-card-text">I sistemi robotici guidati da AI — come da Vinci, Mako e Hugo — consentono procedure complesse con maggiore precisione e minor invasività. L'AI analizza in tempo reale i feed video chirurgici per identificare strutture anatomiche critiche, prevenire lesioni accidentali e ottimizzare i movimenti. I dati aggregati da migliaia di interventi migliorano continuamente i modelli, creando un ciclo di apprendimento collettivo tra chirurghi globali.</p>
+      <a class="app-card-source" href="https://www.geopop.it/intelligenza-artificiale-in-medicina-quali-sono-gli-utilizzi-e-gli-sviluppi-futuri/" target="_blank">GeoPop — Chirurgia Robotica</a>
+    </div>
+    <div class="app-card fade-up">
+      <span class="app-icon">🧠</span>
+      <h3 class="app-card-title">Neurologia e Salute Mentale</h3>
+      <p class="app-card-text">Gli algoritmi AI analizzano pattern di linguaggio, voce e movimenti oculari per rilevare precocemente Alzheimer, Parkinson e disturbi depressivi maggiori. App di digital therapeutics come Woebot e Wysa offrono supporto psicologico basato su CBT con supervisione clinica. Sistemi di neuroimaging con AI possono identificare biomarcatori di malattie neurodegenerative anni prima della comparsa dei sintomi clinici.</p>
+      <a class="app-card-source" href="https://www.fortuneita.com/2024/12/31/ai-in-medicina-il-2024-e-stato-solo-linizio/" target="_blank">Fortune Italia</a>
+    </div>
+    <div class="app-card fade-up">
+      <span class="app-icon">❤️</span>
+      <h3 class="app-card-title">Cardiologia Predittiva</h3>
+      <p class="app-card-text">I modelli AI analizzano ECG, dati Holter e biosegnali wearable per predire aritmie, insufficienza cardiaca e infarto del miocardio prima che diventino eventi acuti. L'algoritmo di Apple Watch per la fibrillazione atriale è stato validato su studi con oltre 400.000 partecipanti. Google ha dimostrato che l'AI può predire il rischio cardiovascolare a 5 anni dall'analisi del fondo dell'occhio.</p>
+      <a class="app-card-source" href="https://www.latestatamagazine.it/2026/02/lintelligenza-artificiale-in-medicina-una-rivoluzione-concreta/" target="_blank">La Testata Magazine</a>
+    </div>
+    <div class="app-card fade-up">
+      <span class="app-icon">📋</span>
+      <h3 class="app-card-title">Studi Clinici Accelerati</h3>
+      <p class="app-card-text">L'AI ottimizza il design degli studi clinici, identifica i pazienti più adatti per ogni sperimentazione attraverso criteri di inclusione intelligenti e analizza in tempo reale i dati raccolti per adattare il protocollo. La riduzione dei tempi di reclutamento e l'analisi adattiva dei dati può dimezzare la durata di una sperimentazione clinica di fase III, accelerando significativamente l'accesso dei pazienti a nuove terapie.</p>
+      <a class="app-card-source" href="https://www.latestatamagazine.it/2026/02/lintelligenza-artificiale-in-medicina-una-rivoluzione-concreta/" target="_blank">La Testata Magazine</a>
+    </div>
+  </div>
+</section>
+
+<!-- DIAGNOSTICS DEEP DIVE -->
+<section class="diagnostics-section" id="diagnostica">
+  <div class="section-label">Analisi Approfondita</div>
+  <h2 class="section-title fade-up">AI nella Diagnostica per Immagini: i Dati</h2>
+  <p class="section-intro fade-up">Il settore della diagnostica per immagini rappresenta l'applicazione più matura e validata dell'AI in medicina. Ecco cosa dicono i principali studi clinici.</p>
+  <div class="diag-split">
+    <div>
+      <div class="diag-study-list">
+        <div class="diag-study fade-up">
+          <div class="diag-study-head">
+            <h3 class="diag-study-title">Screening Mammografico — Svezia (100K donne)</h3>
+            <span class="diag-study-stat">44%</span>
+          </div>
+          <p class="diag-study-text">Riduzione del carico di lavoro dei radiologi nel gruppo AI-assistito. L'AI ha raggiunto una sensibilità pari a quella di due radiologi esperti con un tasso di richiami simile. Studio <em>Lancet Oncology</em>, 2023.</p>
+        </div>
+        <div class="diag-study fade-up">
+          <div class="diag-study-head">
+            <h3 class="diag-study-title">ScreenTrustMRI — Risonanza Magnetica Oncologica</h3>
+            <span class="diag-study-stat">4×</span>
+          </div>
+          <p class="diag-study-text">64 tumori rilevati ogni 1.000 RM con AI vs 16,5 senza. Il sistema ha identificato lesioni che i radiologi umani avevano mancato, con un tasso di falsi positivi controllato. Dati AIRC 2024.</p>
+        </div>
+        <div class="diag-study fade-up">
+          <div class="diag-study-head">
+            <h3 class="diag-study-title">Screening Polmonare — TAC a Bassa Dose</h3>
+            <span class="diag-study-stat">94%</span>
+          </div>
+          <p class="diag-study-text">Accuratezza dell'algoritmo Lung-RADS potenziato da AI nel classificare i noduli polmonari, riducendo del 30% i follow-up non necessari rispetto alla lettura standard. Studio NIH, 2024.</p>
+        </div>
+        <div class="diag-study fade-up">
+          <div class="diag-study-head">
+            <h3 class="diag-study-title">Retinopatia Diabetica — Diagnosi Automatica</h3>
+            <span class="diag-study-stat">90%</span>
+          </div>
+          <p class="diag-study-text">IDx-DR di Digital Diagnostics, primo dispositivo AI autonomo approvato dalla FDA nel 2018, ha raggiunto sensibilità del 90% e specificità dell'87% nella diagnosi di retinopatia diabetica su oltre 900 pazienti.</p>
+        </div>
+        <div class="diag-study fade-up">
+          <div class="diag-study-head">
+            <h3 class="diag-study-title">Patologia Digitale — Tumore alla Prostata</h3>
+            <span class="diag-study-stat">+11%</span>
+          </div>
+          <p class="diag-study-text">Lo studio PathAI su grading del carcinoma prostatico secondo Gleason ha dimostrato che i patologi assistiti da AI miglioravano la concordanza diagnostica dell'11% rispetto ai soli esperti, riducendo errori clinicamente significativi.</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="diag-visual fade-up">
+        <div class="diag-visual-title">📊 Performance AI vs Specialisti — Benchmark 2024</div>
+        <div class="bar-chart">
+          <div class="bar-row">
+            <div class="bar-label-row">
+              <span class="bar-label">Mammografia (Sensibilità)</span>
+              <span class="bar-value">87%</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="--w:87%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label-row">
+              <span class="bar-label">Melanoma (Classificazione)</span>
+              <span class="bar-value">91%</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="--w:91%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label-row">
+              <span class="bar-label">Retinopatia Diabetica</span>
+              <span class="bar-value">90%</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="--w:90%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label-row">
+              <span class="bar-label">Noduli Polmonari (TAC)</span>
+              <span class="bar-value">94%</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill gold" style="--w:94%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label-row">
+              <span class="bar-label">Ictus — Rilevazione su TC</span>
+              <span class="bar-value">83%</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill accent" style="--w:83%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label-row">
+              <span class="bar-label">Aritmia Cardiaca (ECG)</span>
+              <span class="bar-value">97%</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill gold" style="--w:97%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NUMBERS BAR 2 -->
+<div class="numbers-bar-2 fade-up">
+  <div class="nb2-item">
+    <span class="nb2-num">700+</span>
+    <span class="nb2-label">Dispositivi medici basati su AI approvati dalla FDA</span>
+  </div>
+  <div class="nb2-item">
+    <span class="nb2-num">$4B+</span>
+    <span class="nb2-label">Investimenti globali in AI per la salute nel solo 2024</span>
+  </div>
+  <div class="nb2-item">
+    <span class="nb2-num">200M</span>
+    <span class="nb2-label">Strutture proteiche determinate da AlphaFold, accessibili gratuitamente</span>
+  </div>
+  <div class="nb2-item">
+    <span class="nb2-num">50%</span>
+    <span class="nb2-label">Riduzione potenziale dei tempi nei trial clinici grazie all'AI</span>
+  </div>
+</div>
+
+<!-- DIABETES FOCUS -->
+<section class="diabetes" id="diabete">
+  <div class="section-label">Focus Speciale</div>
+  <h2 class="section-title">AI e Diabete di Tipo 1</h2>
+  <p class="section-intro">Il diabete di tipo 1 è una delle aree dove l'AI produce i risultati più tangibili e trasformativi nella vita quotidiana dei pazienti. Dai sistemi a circuito chiuso alle app predittive, la tecnologia sta riscrivendo la gestione di questa patologia cronica.</p>
+  <div class="diabetes-cols">
+    <div>
+      <div class="pancreas-diagram fade-up">
+        <div class="pd-title">🫀 Il Pancreas Artificiale — Come Funziona</div>
+        <div class="pd-flow">
+          <div class="pd-step">
+            <div class="pd-num">1</div>
+            <div>
+              <div class="pd-step-title">Monitoraggio Continuo della Glicemia (CGM)</div>
+              <div class="pd-step-desc">Un sensore sottocutaneo indossabile misura il glucosio interstiziale ogni 5 minuti, trasmettendo i dati in tempo reale via Bluetooth al sistema di controllo. Dispositivi come Dexcom G7 e Freestyle Libre 3 offrono accuratezza superiore al 99% nel range terapeutico.</div>
+            </div>
+          </div>
+          <div class="pd-step">
+            <div class="pd-num">2</div>
+            <div>
+              <div class="pd-step-title">Algoritmo di Controllo AI</div>
+              <div class="pd-step-desc">Un algoritmo intelligente — di tipo Model Predictive Control (MPC) o Proportional-Integral-Derivative — elabora i dati glicemici correnti e storici e calcola la dose ottimale di insulina da erogare, tenendo conto dei pasti dichiarati, dell'attività fisica e dei pattern individuali.</div>
+            </div>
+          </div>
+          <div class="pd-step">
+            <div class="pd-num">3</div>
+            <div>
+              <div class="pd-step-title">Microinfusore di Insulina Automatico</div>
+              <div class="pd-step-desc">La pompa eroga l'insulina nella quantità prescritta dall'algoritmo, regolando la somministrazione in tempo reale per minimizzare ipo- e iperglicemia. Dispositivi come Omnipod 5 funzionano senza tubicini, migliorando la qualità di vita.</div>
+            </div>
+          </div>
+          <div class="pd-step">
+            <div class="pd-num">4</div>
+            <div>
+              <div class="pd-step-title">Apprendimento Adattivo Personalizzato</div>
+              <div class="pd-step-desc">I sistemi più avanzati come CamAPS FX (Università di Cambridge) imparano dai pattern individuali del paziente, migliorando continuamente le previsioni. L'algoritmo si adatta a condizioni di stress, ciclo mestruale, sport e malattie intercorrenti.</div>
+            </div>
+          </div>
+          <div class="pd-step">
+            <div class="pd-num">5</div>
+            <div>
+              <div class="pd-step-title">Reportistica Clinica Intelligente</div>
+              <div class="pd-step-desc">Il sistema genera report strutturati per il team diabetologico con indicatori come Time in Range (TIR), variabilità glicemica (CV%) e andamenti notturni, facilitando la supervisione clinica da remoto e riducendo la frequenza degli accessi ambulatoriali.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="diabetes-features fade-up">
+      <div class="df-item">
+        <div class="df-item-head">
+          <span class="df-icon">🔄</span>
+          <span class="df-item-title">Sistema Hybrid Closed Loop (HCL)</span>
+        </div>
+        <p class="df-item-text">La tecnologia HCL — "pancreas artificiale" — automatizza la somministrazione insulinica combinando CGM, algoritmo e microinfusore. Il termine "ibrido" indica che il paziente inserisce ancora i boli prandiali, mentre il sistema gestisce la basale. Sistemi fully closed-loop sono in fase di studio avanzato. Il FLAIR Trial del Lancet (2019) ha documentato miglioramenti clinicamente significativi nel time in range rispetto alla terapia standard.</p>
+        <a class="df-source" href="https://www.infermieriattivi.it/tecniche-e-tecnologie/6499-pancreas-artificiale-hybrid-closed-loop.html" target="_blank">Infermieri Attivi, Nov. 2024</a>
+      </div>
+      <div class="df-item">
+        <div class="df-item-head">
+          <span class="df-icon">📈</span>
+          <span class="df-item-title">Previsione Glicemica Postprandiale</span>
+        </div>
+        <p class="df-item-text">Ricercatori del CIRMIS (Università Federico II di Napoli) hanno sviluppato modelli AI per predire la risposta glicemica dopo i pasti — una delle sfide più difficili nel T1D. Il lavoro è stato selezionato tra il 10% dei contributi per presentazione orale ai principali congressi internazionali di diabetologia. La previsione si basa su reti neurali LSTM che integrano dati CGM, insulina, carboidrati e variabili contestuali.</p>
+        <a class="df-source" href="https://www.dottnet.it/articolo/32535960/diabete-di-tipo-1-l-intelligenza-artificiale-ora-puo-predire-i-livelli-glicemici" target="_blank">DottNet — CIRMIS Federico II, 2024</a>
+      </div>
+      <div class="df-item">
+        <div class="df-item-head">
+          <span class="df-icon">📱</span>
+          <span class="df-item-title">App e Supporto Decisionale Personalizzato</span>
+        </div>
+        <p class="df-item-text">Le app basate su machine learning offrono suggerimenti personalizzati su dieta, esercizio e dosaggio insulinico, integrandosi con i dati CGM in tempo reale. Piattaforme come Clarity (Dexcom) e LibreView (Abbott) generano trend analytics per pazienti e medici. L'AI analizza migliaia di punti dati personali per suggerire correzioni proattive prima che si verifichino ipo- o iperglicemie significative.</p>
+        <a class="df-source" href="https://agdricerca.org/2024/05/27/diabete-e-intelligenza-artificiale-come-lapprendimento-automatico-sta-rivoluzionando-la-terapia-e-la-ricerca/" target="_blank">AGDR Ricerca, Maggio 2024</a>
+      </div>
+      <div class="df-item">
+        <div class="df-item-head">
+          <span class="df-icon">🌐</span>
+          <span class="df-item-title">NHS: Adozione Istituzionale su Larga Scala</span>
+        </div>
+        <p class="df-item-text">Il Servizio Sanitario Britannico ha avviato l'introduzione sistematica del pancreas artificiale HCL per tutti i pazienti con T1D idonei, segnando un punto di svolta nell'adozione istituzionale. Si stima che il sistema possa migliorare la qualità della vita di circa 300.000 persone nel solo Regno Unito, riducendo le complicanze croniche e le ospedalizzazioni d'emergenza per chetoacidosi e ipoglicemia grave.</p>
+        <a class="df-source" href="https://auaonline.it/2024/04/10/il-pancreas-artificiale-una-svolta-per-i-diabetici-di-tipo-1/" target="_blank">NHS HCL — The Lancet, FLAIR Trial</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESEARCH SPOTLIGHT -->
+<section class="research-section" id="ricerca">
+  <div class="section-label">Ricerca di Frontiera</div>
+  <h2 class="section-title fade-up">Studi e Pubblicazioni di Riferimento</h2>
+  <p class="section-intro fade-up">Le basi scientifiche che supportano l'adozione clinica dell'AI: i lavori peer-reviewed che stanno cambiando la medicina basata sull'evidenza.</p>
+  <div class="research-grid">
+    <div class="research-card fade-up">
+      <div class="research-card-num">01</div>
+      <h3 class="research-card-title">AlphaFold 2 e la Struttura delle Proteine</h3>
+      <p class="research-card-text">Jumper et al. (2021) su <em>Nature</em> descrivono come AlphaFold 2 abbia risolto il "protein folding problem" con accuratezza senza precedenti. Il database risultante, con oltre 200 milioni di strutture, ha accelerato in modo straordinario la ricerca su farmaci per malaria, tubercolosi, Parkinson e cancro. Alcune strutture precedentemente irrisolvibili con metodi sperimentali sono state determinate in pochi secondi.</p>
+      <span class="research-card-journal">Nature · 2021 · DeepMind / Google</span>
+    </div>
+    <div class="research-card fade-up">
+      <div class="research-card-num">02</div>
+      <h3 class="research-card-title">AI e Screening Mammografico: Meta-analisi Globale</h3>
+      <p class="research-card-text">Lo studio del <em>Lancet Digital Health</em> (2023) analizza 12 studi clinici randomizzati su oltre 250.000 donne in Europa e USA. Risultato: l'AI come secondo lettore è statisticamente equivalente a un secondo radiologo umano, con una riduzione del 40% del carico di lavoro e tassi di richiamo comparabili. Questa evidenza ha spinto la FDA e MHRA a rivedere le linee guida degli screening.</p>
+      <span class="research-card-journal">Lancet Digital Health · 2023</span>
+    </div>
+    <div class="research-card fade-up">
+      <div class="research-card-num">03</div>
+      <h3 class="research-card-title">GPT-4 Supera il 90° Percentile nell'Esame USMLE</h3>
+      <p class="research-card-text">Nori et al. (2023) di Microsoft Research dimostrano che GPT-4 supera il 90° percentile negli esami USMLE Step 1, 2 e 3, senza fine-tuning specifico. Il modello mostra ragionamento clinico avanzato, gestione dell'incertezza diagnostica e capacità di integrazione di informazioni complesse, suggerendo un ruolo futuro come assistente decisionale per medici di ogni specialità.</p>
+      <span class="research-card-journal">Microsoft Research · arXiv 2303.13375 · 2023</span>
+    </div>
+    <div class="research-card fade-up">
+      <div class="research-card-num">04</div>
+      <h3 class="research-card-title">Pancreas Artificiale — FLAIR Trial (The Lancet)</h3>
+      <p class="research-card-text">Il trial FLAIR (Fully Closed Loop Insulin Delivery vs AID) pubblicato su <em>The Lancet</em> ha confrontato il sistema HCL CamAPS FX con la terapia convenzionale in 116 adulti con T1D. Il gruppo HCL ha mostrato un miglioramento di 10 punti percentuali nel Time in Range (≥3,9–10 mmol/L) e una riduzione significativa degli episodi di ipoglicemia severa. Risultati che hanno accelerato l'approvazione regolatoria in Europa e UK.</p>
+      <span class="research-card-journal">The Lancet · FLAIR Trial · 2019 / NHS rollout 2024</span>
+    </div>
+    <div class="research-card fade-up">
+      <div class="research-card-num">05</div>
+      <h3 class="research-card-title">AI Predice il Rischio CV dall'Immagine della Retina</h3>
+      <p class="research-card-text">Google Health (2018, pubblicato su <em>Nature Biomedical Engineering</em>) ha dimostrato che una rete neurale addestrata su 300.000 fundus images poteva predire età, sesso, pressione sistolica e rischio cardiovascolare a 5 anni — senza informazioni cliniche aggiuntive. L'area AUC era paragonabile ai modelli clinici tradizionali, aprendo la strada a screening cardiovascolari non invasivi e a basso costo tramite fotografia retinica.</p>
+      <span class="research-card-journal">Nature Biomedical Engineering · Google Health · 2018</span>
+    </div>
+    <div class="research-card fade-up">
+      <div class="research-card-num">06</div>
+      <h3 class="research-card-title">FUTURE-AI: Linee Guida Internazionali per AI Clinica Affidabile</h3>
+      <p class="research-card-text">Il framework FUTURE-AI, sviluppato da un consorzio internazionale di oltre 30 istituzioni accademiche e industriali, definisce 30 linee guida per lo sviluppo di AI affidabile in medicina. I principi includono fairness, universalità, tracciabilità, usabilità, robustezza ed efficacia clinica. Pubblicato su <em>Nature Medicine</em> nel 2024, rappresenta lo standard de facto per la certificazione di dispositivi medici AI in Europa.</p>
+      <span class="research-card-journal">Nature Medicine · FUTURE-AI Consortium · 2024</span>
+    </div>
+  </div>
+</section>
+
+<!-- FUTURE -->
+<section class="future-section" id="futuro">
+  <div class="section-label">Orizzonti 2026–2035</div>
+  <h2 class="section-title fade-up">Il Futuro Prossimo dell'AI in Medicina</h2>
+  <p class="section-intro fade-up">Tre ondate di innovazione trasformeranno la sanità nei prossimi anni: sistemi in fase di adozione, tecnologie emergenti e frontiere ancora da esplorare.</p>
+  <div class="future-grid">
+    <div class="future-card fade-up">
+      <div class="future-card-year">2026</div>
+      <h3 class="future-card-title">Agenti AI Autonomi in Clinica</h3>
+      <p class="future-card-text">Sistemi agentici AI che gestiscono in autonomia il triage ospedaliero, ordinano esami appropriati, interpretano i risultati e generano piani terapeutici preliminari per revisione medica. Progetti pilota in corso presso Mayo Clinic, Cleveland Clinic e NHS England. La supervisione medica rimane obbligatoria per ogni decisione clinica finale.</p>
+      <span class="future-card-status status-active">Adozione in corso</span>
+    </div>
+    <div class="future-card fade-up">
+      <div class="future-card-year">2027</div>
+      <h3 class="future-card-title">Gemelli Digitali del Paziente</h3>
+      <p class="future-card-text">Repliche digitali complete del profilo biologico individuale — genomica, proteomica, microbioma, imaging e dati wearable — che permettono di simulare la risposta a trattamenti alternativi prima di somministrarli. La tecnologia consentirà di ottimizzare dosaggi, prevedere tossicità e personalizzare la terapia oncologica con precisione senza precedenti.</p>
+      <span class="future-card-status status-emerging">In sviluppo avanzato</span>
+    </div>
+    <div class="future-card fade-up">
+      <div class="future-card-year">2028</div>
+      <h3 class="future-card-title">Fully Closed Loop per Diabete T1</h3>
+      <p class="future-card-text">Sistemi di pancreas artificiale completamente automatizzati senza input utente per i boli prandiali, basati su algoritmi predittivi multimodali che integrano dati CGM, accelerometro, heart rate variability e pattern comportamentali. I trial di fase III sono già in corso. Si prevede approvazione EMA e FDA entro il 2028–2029.</p>
+      <span class="future-card-status status-emerging">Trial clinici in corso</span>
+    </div>
+    <div class="future-card fade-up">
+      <div class="future-card-year">2030</div>
+      <h3 class="future-card-title">Drug Discovery Completamente AI-Driven</h3>
+      <p class="future-card-text">Pipeline farmaceutiche interamente gestite da AI, dalla scoperta molecolare al design del trial clinico. Le prime molecole progettate interamente da AI — come INS018_055 di Insilico Medicine per la fibrosi polmonare — stanno già entrando in fase II. Entro il 2030, si prevede che il 30% dei nuovi farmaci in fase di sviluppo proverrà da pipeline AI-first.</p>
+      <span class="future-card-status status-emerging">Fase II in corso</span>
+    </div>
+    <div class="future-card fade-up">
+      <div class="future-card-year">2032</div>
+      <h3 class="future-card-title">Prevenzione Predittiva Personalizzata</h3>
+      <p class="future-card-text">Sistemi AI che monitorano continuamente la salute dell'individuo e identificano il rischio di malattie croniche — cancro, cardiovascolari, neurodegenerative — anni prima dei sintomi, consentendo interventi preventivi mirati. Wearable di nuova generazione e analisi multiomiche regolari alimenteranno modelli di rischio personalizzati ad altissima risoluzione temporale.</p>
+      <span class="future-card-status status-horizon">Ricerca di frontiera</span>
+    </div>
+    <div class="future-card fade-up">
+      <div class="future-card-year">2035</div>
+      <h3 class="future-card-title">AI e Medicina Rigenerativa</h3>
+      <p class="future-card-text">L'integrazione tra AI, biologia sintetica e bioprinting consentirà di progettare e ottimizzare organoidi, tessuti ingegnerizzati e terapie cellulari personalizzate. L'AI guiderà la riprogrammazione cellulare, il design di vettori virali per terapie geniche e la creazione di scaffold biocompatibili su misura per il profilo immunitario del singolo paziente.</p>
+      <span class="future-card-status status-horizon">Orizzonte di ricerca</span>
+    </div>
+  </div>
+</section>
+
+<!-- CHALLENGES -->
+<section class="challenges" id="sfide">
+  <div class="section-label">Prospettive Critiche</div>
+  <h2 class="section-title fade-up">Sfide Etiche, Cliniche e Regolatorie</h2>
+  <p class="section-intro fade-up">L'adozione dell'AI in medicina non è priva di ostacoli. Preoccupazioni etiche, questioni di privacy e la necessità di normative robuste accompagnano la rapida innovazione tecnologica.</p>
+  <div class="ch-grid">
+    <div class="ch-card fade-up">
+      <h3 class="ch-card-title">🔒 Privacy e Protezione dei Dati Sanitari</h3>
+      <p class="ch-card-text">Le preoccupazioni per la riservatezza delle cartelle cliniche elettroniche sono diffuse, specialmente in Europa. L'addestramento di modelli AI richiede enormi volumi di dati sensibili. Il GDPR e il Regolamento EU per i dispositivi medici (MDR) definiscono vincoli precisi, ma l'armonizzazione globale dei quadri normativi sulla salute digitale rimane incompleta e fonte di incertezza giuridica per le aziende del settore.</p>
+    </div>
+    <div class="ch-card fade-up">
+      <h3 class="ch-card-title">⚖️ Bias Algoritmico e Disparità di Cura</h3>
+      <p class="ch-card-text">I modelli addestrati su dataset non rappresentativi possono replicare o amplificare le disparità di cura esistenti lungo linee di razza, genere e condizione socioeconomica. Studi hanno dimostrato che alcuni algoritmi per il dolore sottostimano la gravità dei sintomi nei pazienti afroamericani. La governance responsabile richiede trasparenza, audit indipendente e validazione su popolazioni eterogenee.</p>
+    </div>
+    <div class="ch-card fade-up">
+      <h3 class="ch-card-title">📋 Certificazione, Responsabilità e Medicolegalità</h3>
+      <p class="ch-card-text">Chi risponde legalmente di un errore diagnostico prodotto da un sistema AI? Il regolamento europeo AI Act (2024) classifica i dispositivi medici AI come "alto rischio", imponendo obblighi di trasparenza, documentazione e audit umano. Ma la catena di responsabilità tra produttore, ospedale e medico prescrittore rimane un nodo giuridico irrisolto in molti ordinamenti nazionali.</p>
+    </div>
+    <div class="ch-card fade-up">
+      <h3 class="ch-card-title">🧪 Solidità delle Evidenze Cliniche</h3>
+      <p class="ch-card-text">Nonostante la maturità tecnologica, la quantità di evidenze da studi randomizzati controllati (RCT) a supporto dei sistemi AI rimane limitata in molte specialità. La maggior parte delle validazioni proviene da studi retrospettivi su dataset storici — un approccio che non controlla per variabili confondenti e cambiamenti nel contesto clinico. Studi prospettici rigorosi sono ancora la minoranza.</p>
+    </div>
+    <div class="ch-card fade-up">
+      <h3 class="ch-card-title">🏗️ Integrazione nei Sistemi Sanitari Esistenti</h3>
+      <p class="ch-card-text">Molti ospedali operano con sistemi informativi legacy incompatibili con le moderne piattaforme AI. L'interoperabilità tra EHR di produttori diversi, la qualità eterogenea dei dati storici e la resistenza culturale al cambiamento da parte del personale sanitario rappresentano barriere pratiche all'adozione altrettanto significative delle sfide tecnologiche o normative.</p>
+    </div>
+    <div class="ch-card fade-up">
+      <h3 class="ch-card-title">💰 Equità Nell'Accesso alle Tecnologie AI</h3>
+      <p class="ch-card-text">Esiste il rischio concreto che le tecnologie AI in medicina migliorino ulteriormente la qualità delle cure nei sistemi sanitari già avanzati, ampliando il divario con i paesi a reddito basso e medio. I modelli commerciali delle principali aziende AI sanitarie sono calibrati su mercati occidentali ad alto reddito. Iniziative come quelle dell'OMS per l'AI equa in salute globale cercano di affrontare questo squilibrio.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SOURCES -->
+<section class="sources" id="fonti">
+  <div class="section-label">Bibliografia</div>
+  <h2 class="section-title">Fonti e Riferimenti</h2>
+  <div class="sources-list">
+    <a class="source-item" href="https://www.airc.it/cancro/informazioni-tumori/corretta-informazione/intelligenza-artificiale-diagnosi-tumori" target="_blank">
+      <span class="source-num">01</span>
+      <div class="source-text">
+        <span class="source-title">L'AI può diagnosticare i tumori? Vantaggi, limiti e applicazioni</span>
+        <span class="source-meta">AIRC — Associazione Italiana per la Ricerca sul Cancro · 2024–2026</span>
+      </div>
+      <span class="source-tag">Oncologia</span>
+    </a>
+    <a class="source-item" href="https://www.latestatamagazine.it/2026/02/lintelligenza-artificiale-in-medicina-una-rivoluzione-concreta/" target="_blank">
+      <span class="source-num">02</span>
+      <div class="source-text">
+        <span class="source-title">L'intelligenza artificiale in medicina: una rivoluzione concreta</span>
+        <span class="source-meta">La Testata Magazine · Febbraio 2026 · Mercato globale, statistiche adozione</span>
+      </div>
+      <span class="source-tag">Mercato</span>
+    </a>
+    <a class="source-item" href="https://www.fortuneita.com/2024/12/31/ai-in-medicina-il-2024-e-stato-solo-linizio/" target="_blank">
+      <span class="source-num">03</span>
+      <div class="source-text">
+        <span class="source-title">AI in medicina: il 2024 è stato solo l'inizio</span>
+        <span class="source-meta">Fortune Italia · Dicembre 2024 · Emergenze sanitarie globali e AI</span>
+      </div>
+      <span class="source-tag">Panoramica</span>
+    </a>
+    <a class="source-item" href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10271231/" target="_blank">
+      <span class="source-num">04</span>
+      <div class="source-text">
+        <span class="source-title">The Artificial Pancreas and Type 1 Diabetes — Nwokolo & Hovorka</span>
+        <span class="source-meta">JCEM / NIH PubMed · 2023 · DOI: 10.1210/clinem/dgad068</span>
+      </div>
+      <span class="source-tag">Peer-reviewed</span>
+    </a>
+    <a class="source-item" href="https://agdricerca.org/2024/05/27/diabete-e-intelligenza-artificiale-come-lapprendimento-automatico-sta-rivoluzionando-la-terapia-e-la-ricerca/" target="_blank">
+      <span class="source-num">05</span>
+      <div class="source-text">
+        <span class="source-title">Diabete e Intelligenza Artificiale: L'Apprendimento Automatico nella Terapia</span>
+        <span class="source-meta">AGDR Ricerca · Maggio 2024 · Pancreas artificiale, app mobile, ricerca</span>
+      </div>
+      <span class="source-tag">Diabete T1</span>
+    </a>
+    <a class="source-item" href="https://www.dottnet.it/articolo/32535960/diabete-di-tipo-1-l-intelligenza-artificiale-ora-puo-predire-i-livelli-glicemici" target="_blank">
+      <span class="source-num">06</span>
+      <div class="source-text">
+        <span class="source-title">Diabete di tipo 1: l'AI ora può predire i livelli glicemici</span>
+        <span class="source-meta">DottNet · Marzo 2024 · CIRMIS, Università Federico II di Napoli</span>
+      </div>
+      <span class="source-tag">Ricerca IT</span>
+    </a>
+    <a class="source-item" href="https://www.infermieriattivi.it/tecniche-e-tecnologie/6499-pancreas-artificiale-hybrid-closed-loop.html" target="_blank">
+      <span class="source-num">07</span>
+      <div class="source-text">
+        <span class="source-title">Il "pancreas artificiale" Hybrid Closed Loop (HCL) — CamAPS FX</span>
+        <span class="source-meta">Infermieri Attivi · Novembre 2024 · Università di Cambridge</span>
+      </div>
+      <span class="source-tag">HCL</span>
+    </a>
+    <a class="source-item" href="https://www.iamedicina.it/news" target="_blank">
+      <span class="source-num">08</span>
+      <div class="source-text">
+        <span class="source-title">Screening Mammografico AI — Lancet Digital Health</span>
+        <span class="source-meta">iamedicina.it · 2025–2026 · Studi Svezia, Germania, USA (>100.000 donne)</span>
+      </div>
+      <span class="source-tag">Screening</span>
+    </a>
+    <a class="source-item" href="https://www.geopop.it/intelligenza-artificiale-in-medicina-quali-sono-gli-utilizzi-e-gli-sviluppi-futuri/" target="_blank">
+      <span class="source-num">09</span>
+      <div class="source-text">
+        <span class="source-title">Intelligenza Artificiale in Medicina: utilizzi e sviluppi futuri</span>
+        <span class="source-meta">GeoPop · 2024 · Drug discovery, chirurgia robotica, gestione clinica</span>
+      </div>
+      <span class="source-tag">Overview</span>
+    </a>
+    <a class="source-item" href="https://www.nature.com/articles/s41586-021-03819-2" target="_blank">
+      <span class="source-num">10</span>
+      <div class="source-text">
+        <span class="source-title">Highly accurate protein structure prediction with AlphaFold — Jumper et al.</span>
+        <span class="source-meta">Nature · 2021 · DeepMind · DOI: 10.1038/s41586-021-03819-2</span>
+      </div>
+      <span class="source-tag">Peer-reviewed</span>
+    </a>
+    <a class="source-item" href="https://arxiv.org/abs/2303.13375" target="_blank">
+      <span class="source-num">11</span>
+      <div class="source-text">
+        <span class="source-title">Can Generalist Foundation Models Outcompete Special-Purpose Tuning? (GPT-4 & USMLE)</span>
+        <span class="source-meta">Nori et al. · Microsoft Research · arXiv 2303.13375 · 2023</span>
+      </div>
+      <span class="source-tag">LLM Clinici</span>
+    </a>
+    <a class="source-item" href="https://auaonline.it/2024/04/10/il-pancreas-artificiale-una-svolta-per-i-diabetici-di-tipo-1/" target="_blank">
+      <span class="source-num">12</span>
+      <div class="source-text">
+        <span class="source-title">Il Pancreas Artificiale: una svolta per i diabetici di tipo 1</span>
+        <span class="source-meta">AUA Online · Aprile 2024 · NHS, FLAIR Trial, CamAPS FX</span>
+      </div>
+      <span class="source-tag">Diabete T1</span>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-brand"><span class="dot">◆</span> AI & Medicina</span>
+  <span>Contenuto a scopo divulgativo · Fonti citate in pagina · 2026</span>
+  <span>Creato con Claude — Anthropic</span>
+</footer>
+
+<script>
+// ── Intersection Observer for fade-up
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-up, .tl-item').forEach(el => fadeObserver.observe(el));
+
+// ── Bar chart animation
+const barObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.bar-fill').forEach((bar, i) => {
+        setTimeout(() => {
+          bar.style.width = bar.style.getPropertyValue('--w') || getComputedStyle(bar).getPropertyValue('--w');
+        }, i * 120);
+      });
+      barObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+const barChart = document.querySelector('.bar-chart');
+if (barChart) barObserver.observe(barChart);
+
+// ── Animate numbers
+function animateNum(el, target, prefix, suffix) {
+  const duration = 2000;
+  let start = null;
+  const step = (ts) => {
+    if (!start) start = ts;
+    const p = Math.min((ts - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const val = Math.floor(eased * target);
+    el.textContent = prefix + val.toLocaleString('it-IT') + suffix;
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+const numObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('[data-target]').forEach(el => {
+        const target = parseInt(el.dataset.target);
+        const prefix = el.dataset.prefix || '';
+        const suffix = el.dataset.suffix || '';
+        animateNum(el, target, prefix, suffix);
+      });
+      numObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.4 });
+
+document.querySelectorAll('.numbers-bar, .numbers-bar-2').forEach(el => numObserver.observe(el));
+</script>
+</body>
+</html>

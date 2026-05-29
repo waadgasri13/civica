@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energivora - Dati</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Montserrat', sans-serif; line-height: 1.6; color: #fffdd0; background: linear-gradient(135deg, #40836d, #088f8f); overflow-x: hidden; }
+        p { text-align: justify; }
+
+        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.6s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* HERO */
+        .hero { background: linear-gradient(135deg, #013220, #0F4C5C); color: #FFfdd0; padding: 50px 5%; position: relative; }
+        .hero-nav { display: flex; justify-content: center; align-items: center; width: 100%; max-width: 1200px; margin: 0 auto; position: relative; }
+        .hero-text { text-align: center; }
+        .hero-text h2 { font-size: 2.5rem; margin-bottom: 15px; line-height: 1.2; }
+        .hero-text strong { font-size: 1.1rem; color: #fffdd0; opacity: 0.9; }
+        .menu-btn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; width: 35px; height: 24.5px; z-index: 1000; }
+        .menu-btn span { display: block; height: 3px; width: 100%; background-color: #fffdd0; border-radius: 3px; }
+
+        /* SIDEBAR */
+        .sidebar-nav { position: fixed; top: 0; right: -300px; width: 300px; height: 100%; background: linear-gradient(135deg, #013220, #0F4C5C); padding: 30px 20px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1050; box-shadow: -5px 0 20px rgba(0,0,0,0.4); display: flex; flex-direction: column; }
+        .sidebar-nav.active { right: 0; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,200,87,0.2); }
+        .sidebar-header h2 { color: #FFfdd0; font-size: 1.1rem; letter-spacing: 2px; font-weight: bold; }
+        .close-btn { color: #f5f5dc; font-size: 3rem; cursor: pointer; line-height: 0.7; transition: 0.3s; }
+        .close-btn:hover { transform: rotate(90deg); color: #0F4C5C; }
+        .sidebar-menu { display: flex; flex-direction: column; gap: 15px; flex-grow: 1; }
+        .sidebar-nav a { padding: 15px 20px; text-decoration: none; font-size: 1rem; color: #FFfdd0; background: rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; font-weight: bold; border-radius: 12px; border: 1px solid rgba(255,111,97,0.2); }
+        .sidebar-nav a:hover { background: linear-gradient(135deg, #40836d, #088f8f); color: #f5f5dc; transform: translateX(-5px); }
+        .sidebar-tips { margin-top: auto; padding: 20px; border-radius: 15px; border: 1px dashed #FFfdd0; }
+        .sidebar-tips h4 { color: #FFfdd0; font-size: 1.1rem; margin-bottom: 10px; }
+        .sidebar-tips p { color: #FFF6F0; font-size: 0.87rem; margin-bottom: 5px; opacity: 0.8; word-break: break-all; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(1,50,32,0.7); z-index: 1040; }
+        .overlay.active { display: block; }
+
+        /* ===== LAYOUT ===== */
+        .container { width: 95%; max-width: 1200px; margin: 40px auto; }
+
+        /* Griglia a 12 colonne — ogni riga deve sommare 12 */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-auto-rows: auto;
+            gap: 18px;
+        }
+
+        /* CARD */
+        .bento-item {
+            border-radius: 22px;
+            padding: 22px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 6px 28px rgba(0,0,0,0.18);
+        }
+
+        /* 12 colori distinti, tutti scuri */
+        .c1  { background: #012a1a; border: 1px solid rgba(42,215,120,0.28); }
+        .c2  { background: #0d3b4f; border: 1px solid rgba(93,212,212,0.35); }
+        .c3  { background: #1c4730; border: 1px solid rgba(64,131,109,0.4); }
+        .c4  { background: #5a1f00; border: 1px solid rgba(215,95,42,0.4); }
+        .c5  { background: #0b2e3a; border: 1px solid rgba(8,143,143,0.35); }
+        .c6  { background: #2c0c38; border: 1px solid rgba(192,132,252,0.35); }
+        .c7  { background: #1e3d2c; border: 1px solid rgba(42,215,120,0.22); }
+        .c8  { background: #3b1900; border: 1px solid rgba(215,95,42,0.32); }
+        .c9  { background: #09303f; border: 1px solid rgba(93,212,212,0.28); }
+        .c10 { background: #0e4a5a; border: 1px solid rgba(255,253,208,0.13); }
+        .c11 { background: #381800; border: 1px solid rgba(215,95,42,0.28); }
+        .c12 { background: #012e1c; border: 1px solid rgba(42,215,120,0.22); }
+
+        /* Span colonne — OGNI RIGA DEVE FARE 12 */
+        .col-4  { grid-column: span 4; }
+        .col-5  { grid-column: span 5; }
+        .col-6  { grid-column: span 6; }
+        .col-7  { grid-column: span 7; }
+        .col-8  { grid-column: span 8; }
+        .col-12 { grid-column: span 12; }
+
+        /* TIPOGRAFIA */
+        .card-label {
+            font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.14em; display: flex; align-items: center; gap: 6px;
+            opacity: 0.65; color: #fffdd0;
+        }
+        .card-label::before {
+            content: ''; width: 7px; height: 7px; border-radius: 50%;
+            background: #2ad778; flex-shrink: 0;
+        }
+        .c4 .card-label::before, .c8 .card-label::before, .c11 .card-label::before { background: #ff9a6c; }
+        .c6 .card-label::before { background: #c084fc; }
+        .c2 .card-label::before, .c5 .card-label::before, .c9 .card-label::before, .c10 .card-label::before { background: #5dd4d4; }
+
+        .card-title { font-size: 1.08rem; font-weight: 700; line-height: 1.3; color: #fffdd0; }
+        .card-body  { font-size: 0.79rem; line-height: 1.7; color: rgba(255,253,208,0.82); }
+        .card-body strong { color: #fffdd0; font-weight: 700; }
+        .card-note  { font-size: 0.68rem; color: rgba(255,253,208,0.5); text-align: left; }
+
+        .card-divider { border: none; border-top: 1px solid rgba(255,253,208,0.1); }
+
+        /* STAT HERO */
+        .stat-hero { font-size: 2.8rem; font-weight: 900; line-height: 1; }
+        .c1 .stat-hero, .c3 .stat-hero, .c7 .stat-hero, .c12 .stat-hero { color: #2ad778; }
+        .c2 .stat-hero, .c5 .stat-hero, .c9 .stat-hero, .c10 .stat-hero { color: #5dd4d4; }
+        .c4 .stat-hero, .c8 .stat-hero, .c11 .stat-hero { color: #ff9a6c; }
+        .c6 .stat-hero { color: #c084fc; }
+        .stat-unit { font-size: 0.7rem; font-weight: 600; opacity: 0.55; text-transform: uppercase; letter-spacing: 0.08em; }
+
+        /* MINI-GRID INTERNA */
+        .ig { display: grid; gap: 9px; }
+        .ig-2 { grid-template-columns: 1fr 1fr; }
+        .ig-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .ig-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+        .sbox {
+            border-radius: 11px; padding: 10px 12px;
+            background: rgba(255,253,208,0.055);
+            border: 1px solid rgba(255,253,208,0.09);
+        }
+        .sbox .v { font-size: 1.2rem; font-weight: 900; line-height: 1; }
+        .c1 .sbox .v, .c3 .sbox .v, .c7 .sbox .v, .c12 .sbox .v { color: #2ad778; }
+        .c2 .sbox .v, .c5 .sbox .v, .c9 .sbox .v, .c10 .sbox .v { color: #5dd4d4; }
+        .c4 .sbox .v, .c8 .sbox .v, .c11 .sbox .v { color: #ff9a6c; }
+        .c6 .sbox .v { color: #c084fc; }
+        .sbox .l { font-size: 0.62rem; font-weight: 600; opacity: 0.55; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* LISTA */
+        .card-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+        .card-list li { font-size: 0.78rem; padding-left: 15px; position: relative; line-height: 1.5; color: rgba(255,253,208,0.82); }
+        .card-list li::before { content: '▸'; position: absolute; left: 0; font-size: 0.7rem; top: 2px; color: #2ad778; }
+        .c4 .card-list li::before, .c8 .card-list li::before, .c11 .card-list li::before { color: #ff9a6c; }
+        .c6 .card-list li::before { color: #c084fc; }
+        .c2 .card-list li::before, .c5 .card-list li::before, .c9 .card-list li::before, .c10 .card-list li::before { color: #5dd4d4; }
+        .card-list li strong { color: #fffdd0; }
+
+        /* PILL */
+        .pill-row { display: flex; flex-wrap: wrap; gap: 6px; }
+        .pill { padding: 3px 10px; border-radius: 50px; font-size: 0.68rem; font-weight: 700; white-space: nowrap; }
+        .pill        { background: rgba(255,253,208,0.08); color: #fffdd0; border: 1px solid rgba(255,253,208,0.16); }
+        .pill.green  { background: rgba(42,215,120,0.14); color: #2ad778; border-color: rgba(42,215,120,0.3); }
+        .pill.teal   { background: rgba(93,212,212,0.14); color: #5dd4d4; border-color: rgba(93,212,212,0.3); }
+        .pill.orange { background: rgba(215,95,42,0.18); color: #ff9a6c; border-color: rgba(215,95,42,0.32); }
+        .pill.purple { background: rgba(192,132,252,0.14); color: #c084fc; border-color: rgba(192,132,252,0.28); }
+
+        /* CHART */
+        .chart-wrap { position: relative; flex-grow: 1; }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .bento-grid { grid-template-columns: repeat(6, 1fr); }
+            .col-4, .col-5, .col-6, .col-7, .col-8 { grid-column: span 6; }
+            .col-12 { grid-column: span 6; }
+        }
+        @media (max-width: 560px) {
+            .bento-grid { grid-template-columns: 1fr; }
+            .col-4, .col-5, .col-6, .col-7, .col-8, .col-12 { grid-column: span 1; }
+        }
+
+        footer { text-align: center; padding: 30px; background: linear-gradient(135deg, #013220, #0F4C5C); color: #FFfdd0; margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+<div class="sidebar-nav" id="sidebarNav">
+    <div class="sidebar-header">
+        <h2>&ensp;&ensp;&thinsp;Naviga per ⚡Energivora⚡</h2>
+        <div class="close-btn" onclick="toggleMenu()">&times;</div>
+    </div>
+    <div class="sidebar-menu">
+        <a href="../index.html" onclick="toggleMenu()">Home <span>🏠</span></a>
+        <a href="ener/energivora.html" onclick="toggleMenu()">Calcolatore <span>📠</span></a>
+        <a href="ener/Energivora - Sondaggio.html" onclick="toggleMenu()">Sondaggio <span>🕵</span></a>
+    </div>
+    <div class="sidebar-tips">
+        <h4>🌐 I nostri Contatti 🌐</h4>
+        <p>energivora.ia@gmail.com</p>
+        <p>lexius.cobio@gmail.com</p>
+        <p>pierluigisantagata@gmail.com</p>
+    </div>
+</div>
+
+<section class="hero">
+    <div class="hero-nav">
+        <div class="hero-text">
+            <h2>Quanto consuma l'IA?</h2>
+            <strong>Consapevolezza e azioni concrete per ridurre l'impatto quotidiano</strong>
+        </div>
+        <div class="menu-btn" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+<main class="bento-grid">
+
+<!-- ═══ RIGA 1: 7 + 5 = 12 ═══ -->
+
+<!-- ① DATA CENTER NEL MONDO — col-7 -->
+<div class="bento-item c1 col-7 reveal">
+    <span class="card-label">Cap. 1 — Infrastruttura globale</span>
+    <p class="card-title">Data Center nel Mondo</p>
+    <div class="ig ig-3">
+        <div class="sbox"><div class="v">11.000</div><div class="l">DC nel mondo</div></div>
+        <div class="sbox"><div class="v">4.200</div><div class="l">Persone equiv. acqua (1 DC grande, USA)</div></div>
+        <div class="sbox"><div class="v">25%</div><div class="l">Elettricità dello Stato della Virginia</div></div>
+    </div>
+    <p class="card-body">
+        In <strong>6 Stati USA</strong> i data center consumano il 10% del totale elettrico, con la Virginia al 25%.
+        USA al 45%, Cina al 25%, Europa al 15% dei consumi globali.
+        In Irlanda nel 2024 i DC hanno superato le abitazioni urbane: <strong>22% vs 18%</strong>.
+        La concentrazione in grandi cluster genera squilibri nella rete locale.
+    </p>
+    <!-- RADAR: 9 hub IEA dalla mappa ufficiale -->
+    <p class="card-note">Top 9 hub mondiali per carico IT installato — GW (IEA, CC BY 4.0)</p>
+    <div class="chart-wrap" style="min-height:230px;">
+        <canvas id="radarGeo"></canvas>
+    </div>
+    <div class="pill-row">
+        <span class="pill green">⚡ 1.3% Elettricità Globale</span>
+        <span class="pill teal">🌍 ~1% Emissioni Serra</span>
+    </div>
+</div>
+
+<!-- ② TIPI DI DATA CENTER — col-5 -->
+<div class="bento-item c2 col-5 reveal">
+    <span class="card-label">Cap. 2 — Tipologie</span>
+    <p class="card-title">Tipi di Data Center</p>
+    <div class="ig ig-2">
+        <div class="sbox"><div class="v">5–10 MW</div><div class="l">Piccoli (media)</div></div>
+        <div class="sbox"><div class="v">10–25 MW</div><div class="l">Media potenza</div></div>
+        <div class="sbox"><div class="v">100 MW</div><div class="l">Hyperscale (picco)</div></div>
+        <div class="sbox"><div class="v">400k</div><div class="l">Auto elettriche equiv./anno</div></div>
+    </div>
+    <p class="card-body">Un hyperscale da <strong>100 MW</strong> consuma annualmente quanto <strong>400.000 auto elettriche</strong>.</p>
+    <!-- POLAR AREA: ripartizione tipologie per quota numerica -->
+    <p class="card-note">Distribuzione stimata per quota numerica mondiale</p>
+    <div class="chart-wrap" style="min-height:200px;">
+        <canvas id="polarTypes"></canvas>
+    </div>
+</div>
+
+<!-- ═══ RIGA 2: 4 + 4 + 4 = 12 ═══ -->
+
+<!-- ③ CONSUMO ANNUO — col-4 -->
+<div class="bento-item c3 col-4 reveal">
+    <span class="card-label">Cap. 3 — Trend energetico</span>
+    <p class="card-title">Consumo Annuo dei Data Center</p>
+    <div class="ig ig-2">
+        <div class="sbox"><div class="v">333 TWh</div><div class="l">2022 — 1/1,3% globale</div></div>
+        <div class="sbox"><div class="v">439 TWh</div><div class="l">2024 — 1,5% globale</div></div>
+    </div>
+    <div class="stat-hero">945</div>
+    <div class="stat-unit">TWh previsti al 2030 · +15%/anno</div>
+    <!-- LINE: crescita TWh nel tempo -->
+    <div class="chart-wrap" style="min-height:170px;">
+        <canvas id="lineGrowth"></canvas>
+    </div>
+    <p class="card-body">
+        Crescita <strong>4× più rapida</strong> degli altri settori. Oltre il triplo del fabbisogno dell'<strong>Italia (~300 TWh)</strong>.
+        +<strong>12%/anno</strong> negli ultimi 5 anni. Responsabile di circa <strong>l'1% delle emissioni di gas serra</strong> globali.
+    </p>
+</div>
+
+<!-- ④ CONSUMO CHATBOT — col-4 -->
+<div class="bento-item c4 col-4 reveal">
+    <span class="card-label">Cap. 4 — Impatto AI</span>
+    <p class="card-title">Consumo dei Chatbot</p>
+    <div class="sbox" style="grid-column:span 2"><div class="v">85–134 TWh</div><div class="l">Consumo settore AI entro 2027 (Joule)</div></div>
+    <ul class="card-list">
+        <li><strong>&gt;50%</strong> dell'elettricità dei DC andrà all'AI entro 2028 (MIT Tech Review)</li>
+        <li>Equivale al <strong>22%</strong> del fabbisogno energetico delle famiglie USA</li>
+        <li><strong>Input più lungo</strong> = più calcoli = più energia</li>
+        <li><strong>Modello più grande</strong> = più calcoli per ogni interazione</li>
+    </ul>
+    <!-- DOUGHNUT: quota AI vs resto su DC nel 2028 -->
+    <p class="card-note">Previsione 2028 — quota AI su totale elettricità DC</p>
+    <div class="chart-wrap" style="min-height:170px;">
+        <canvas id="doughnutAI"></canvas>
+    </div>
+</div>
+
+<!-- ⑤ ADDESTRAMENTO — col-4 -->
+<div class="bento-item c5 col-4 reveal">
+    <span class="card-label">Cap. 5 — Training</span>
+    <p class="card-title">Addestramento dei Modelli AI</p>
+    <div class="stat-hero">1.700</div>
+    <div class="stat-unit">GWh — consumo cumulativo stimato grandi modelli</div>
+    <div class="ig ig-2">
+        <div class="sbox"><div class="v">154 MW</div><div class="l">Il modello più grande oggi</div></div>
+        <div class="sbox"><div class="v">630k</div><div class="l">Famiglie italiane equiv./anno</div></div>
+        <div class="sbox"><div class="v">2.700 kWh</div><div class="l">Consumo medio famiglia IT (ARERA)</div></div>
+        <div class="sbox"><div class="v">41,58</div><div class="l">AI grandi per coprire l'Italia intera</div></div>
+    </div>
+    <!-- LINE con area: crescita potenza modelli nel tempo -->
+    <p class="card-note">Potenza nominale cluster di addestramento (MW, stima)</p>
+    <div class="chart-wrap" style="min-height:130px;">
+        <canvas id="lineModels"></canvas>
+    </div>
+</div>
+
+<!-- ═══ RIGA 3: 5 + 7 = 12 ═══ -->
+
+<!-- ⑥ RAFFREDDAMENTO — col-5 -->
+<div class="bento-item c6 col-5 reveal">
+    <span class="card-label">Cap. 6 — Acqua e calore</span>
+    <p class="card-title">Raffreddamento dei Data Center</p>
+    <div class="stat-hero">2,1 mln L</div>
+    <div class="stat-unit">Acqua/giorno — Google Hyperscale 2024/25</div>
+    <div class="ig ig-2">
+        <div class="sbox"><div class="v">500 ml</div><div class="l">Per 10–50 query AI</div></div>
+        <div class="sbox"><div class="v">~0,5 L</div><div class="l">Per scrivere un'e-mail con AI</div></div>
+    </div>
+    <!-- BAR orizzontale: consumo acqua DC per paese -->
+    <p class="card-note">Consumo idrico stimato data center per paese (miliardi di litri/anno)</p>
+    <div class="chart-wrap" style="min-height:210px;">
+        <canvas id="barWaterCountry"></canvas>
+    </div>
+    <p class="card-body">Molti DC si stanno spostando su <strong>sistemi ad aria</strong> o <strong>ricircolo industriale</strong>. I fattori geografici influiscono molto. (Fonte: Deutsche Welle)</p>
+</div>
+
+<!-- ⑦ CHATGPT — col-7 -->
+<div class="bento-item c7 col-7 reveal">
+    <span class="card-label">Cap. 7 — Case study</span>
+    <p class="card-title">ChatGPT: i numeri reali</p>
+    <div class="ig ig-4">
+        <div class="sbox"><div class="v">400–500k</div><div class="l">Server NVIDIA A100 necessari per integrarlo in Google</div></div>
+        <div class="sbox"><div class="v">23–29 TWh</div><div class="l">Consumo annuo stimato</div></div>
+        <div class="sbox"><div class="v">30×</div><div class="l">Rispetto a una ricerca Google standard</div></div>
+        <div class="sbox"><div class="v">1.300 MWh</div><div class="l">GPT-3 (The Verge)</div></div>
+    </div>
+    <p class="card-body">
+        GPT-4 addestrato su <strong>25.000 GPU</strong>, potenza nominale ~<strong>10 MW</strong>
+        (22 MW con raffreddamento) — equivalente a <strong>150 stazioni di ricarica EV ad alta potenza</strong>.
+        Dati di training: circa <strong>4,9 trilioni</strong> di parametri.
+    </p>
+    <!-- RADAR: confronto consumi energetici GPT e riferimenti -->
+    <p class="card-note">Composizione del consumo energetico ChatGPT per fase (MWh, stima)</p>
+    <div class="chart-wrap" style="min-height:190px;">
+        <canvas id="stackedGPT"></canvas>
+    </div>
+</div>
+
+<!-- ═══ RIGA 4: 6 + 6 = 12 ═══ -->
+
+<!-- ⑧ SPECIFICHE TECNICHE — col-6 -->
+<div class="bento-item c8 col-6 reveal">
+    <span class="card-label">Cap. 8 — Hardware & Software</span>
+    <p class="card-title">Specifiche Tecniche</p>
+    <ul class="card-list">
+        <li>Un chip AI moderno usa il <strong>99% di energia in meno</strong> rispetto al 2008 per gli stessi calcoli</li>
+        <li>Il <strong>software bloat</strong> («rigonfiamento del software») annulla i guadagni di efficienza hardware</li>
+        <li>La curva è spinta da <strong>AI generativa</strong>, GPU acceleratori ed espansione del cloud</li>
+        <li><strong>$225 miliardi</strong> investiti in startup AI negli ultimi cinque anni</li>
+    </ul>
+    <!-- LINE: riduzione energia per calcolo chip AI (2008=100%) -->
+    <p class="card-note">Energia relativa per operazione — chip AI (2008 = 100%)</p>
+    <div class="chart-wrap" style="min-height:190px;">
+        <canvas id="lineChip"></canvas>
+    </div>
+    <div class="pill-row">
+        <span class="pill orange">Software Bloat</span>
+        <span class="pill">GPU Acceleratori</span>
+        <span class="pill">Cloud Expansion</span>
+    </div>
+</div>
+
+<!-- ⑨+⑪ ANATOMIA CONSUMO + SOSTENIBILITÀ — col-6 -->
+<div class="bento-item c9 col-6 reveal">
+    <span class="card-label">Cap. 9 — Le 3 componenti · Cap. 10 — Green tech</span>
+    <p class="card-title">Anatomia del Consumo AI & Sviluppo Sostenibile</p>
+    <!-- DOUGHNUT: 3 componenti consumo AI -->
+    <p class="card-note">Ripartizione stimata del consumo elettrico AI</p>
+    <div class="chart-wrap" style="min-height:180px;">
+        <canvas id="doughnutComponents"></canvas>
+    </div>
+    <div class="ig ig-3">
+        <div class="sbox"><div class="v" style="font-size:0.9rem;">🧠 Addestramento</div><div class="l">Una tantum, il più costoso</div></div>
+        <div class="sbox"><div class="v" style="font-size:0.9rem;">⚡ Utilizzo</div><div class="l">Inference — ogni query</div></div>
+        <div class="sbox"><div class="v" style="font-size:0.9rem;">🔧 Ausiliari</div><div class="l">Reti, storage, raffreddamento</div></div>
+    </div>
+    <p class="card-body" style="font-size:0.72rem; text-align:left;">
+        <strong>MWh</strong> = 10⁶ Wh &nbsp;·&nbsp; <strong>GWh</strong> = 10⁹ Wh &nbsp;·&nbsp; <strong>TWh</strong> = 10¹² Wh
+    </p>
+    <hr class="card-divider">
+    <p class="card-title" style="font-size:0.9rem;">⚛️ Sviluppo Sostenibile</p>
+    <ul class="card-list">
+        <li>Meta, Amazon, Google puntano sugli <strong>SMR</strong> (Small Modular Reactors): carico stabile a basse emissioni</li>
+        <li>Costruzione SMR: <strong>diversi anni</strong> e lunghi iter autorizzativi</li>
+        <li><strong>Eolico e solare</strong>: validi ma lenti da scalare</li>
+        <li>Il nucleare <strong>non basta da solo</strong>: serve mix con rinnovabili, efficienza e gestione della domanda</li>
+    </ul>
+    <div class="pill-row">
+        <span class="pill orange">⚛️ SMR</span>
+        <span class="pill green">☀️ Solare</span>
+        <span class="pill green">💨 Eolico</span>
+    </div>
+</div>
+
+<!-- ═══ RIGA 5: 12 = 12 ═══ -->
+
+<!-- ⑩ GENERAZIONE — col-12 -->
+<div class="bento-item c10 col-12 reveal">
+    <span class="card-label">Cap. 11 — Output AI</span>
+    <p class="card-title">Costo energetico per tipo di generazione</p>
+    <div class="ig ig-4">
+        <div class="sbox"><div class="v">&lt;0,3 Wh</div><div class="l">Testo (prompt breve)</div></div>
+        <div class="sbox"><div class="v">1–2 Wh</div><div class="l">Immagine generata</div></div>
+        <div class="sbox"><div class="v">20–100 Wh</div><div class="l">Video 6 secondi</div></div>
+        <div class="sbox"><div class="v">×2/3</div><div class="l">Passaggio a 4K</div></div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; flex-grow:1;">
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            <p class="card-body">
+                Generare testo è relativamente leggero. Le immagini variano per risoluzione e architettura.
+                I video crescono proporzionalmente alla durata, ma molto più velocemente con la risoluzione.
+                Il progetto <strong>Open-Sora</strong> conferma: passare al <strong>4K può raddoppiare o triplicare</strong> l'energia.
+                Un modello image-gen potrebbe generare <strong>55 trilioni di immagini</strong> con ~<strong>100 TWh</strong> di input —
+                circa la metà del fabbisogno annuale dell'Islanda.
+            </p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+            <p class="card-note">Consumo energetico per tipo di output (Wh, scala log)</p>
+            <div class="chart-wrap" style="min-height:180px;">
+                <canvas id="barGeneration"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ RIGA 6: 12 = 12 ═══ -->
+
+<!-- ⑫ TUTTI I MODELLI — col-12 -->
+<div class="bento-item c12 col-12 reveal">
+    <span class="card-label">Cap. 12 — Dataset completo</span>
+    <p class="card-title">Consumo per Prompt — tutti i 20 modelli AI testati (Wh)</p>
+    <p class="card-note">
+        🟠 &gt;1 Wh &nbsp;·&nbsp; 🔵 0,4–1 Wh &nbsp;·&nbsp; 🟢 &lt;0,4 Wh &nbsp;·&nbsp;
+        Sora AI (125 Wh) incluso in scala logaritmica — genera video, non testo.
+        &nbsp;In futuro: <strong>Character.AI · Alexa · Rufus (Amazon)</strong>
+    </p>
+    <div class="chart-wrap" style="min-height:580px;">
+        <canvas id="barModels"></canvas>
+    </div>
+</div>
+
+</main>
+</div>
+
+<footer>
+    <strong>Cobio Alessio & Santagata Pierluigi</strong>
+</footer>
+
+<script>
+function toggleMenu() {
+    document.getElementById('sidebarNav').classList.toggle('active');
+    document.getElementById('overlay').classList.toggle('active');
+}
+const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); }),
+    { threshold: 0.1 }
+);
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ── PALETTE ── */
+const G = '#2ad778', T = '#5dd4d4', O = '#D75F2A', P = '#c084fc';
+const CREAM = 'rgba(255,253,208,0.72)', GRID = 'rgba(255,253,208,0.07)';
+
+/* ── 1. PIE — 9 hub mondiali per GW installati (IEA) ── */
+new Chart(document.getElementById('radarGeo'), {
+    type: 'pie',
+    data: {
+        labels: [
+            'N. Virginia ~7 GW', 'Pearl River Delta ~4 GW', 'Chicago ~2 GW',
+            'Londra ~2 GW', 'Beijing/Shanghai ~2 GW', 'Dallas ~1.8 GW',
+            'Dublino ~1.5 GW', 'Omaha ~1.5 GW', 'Singapore ~1.4 GW'
+        ],
+        datasets: [{
+            data: [7, 4, 2, 2, 2, 1.8, 1.5, 1.5, 1.4],
+            backgroundColor: [
+                '#2ad778', '#1db85e', '#5dd4d4', '#3ab8b8',
+                '#c084fc', '#9b5fe0', '#D75F2A', '#e8844d',
+                '#f0c040'
+            ],
+            borderColor: 'rgba(255,253,208,0.08)',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: { color: CREAM, font: { size: 9, family: 'Montserrat' }, boxWidth: 11, padding: 8 }
+            },
+            tooltip: { callbacks: { label: c => ` ${c.label}: ${c.raw} GW` } }
+        },
+        maintainAspectRatio: false
+    }
+});
+
+/* ── 2. POLAR AREA — tipologie DC ── */
+new Chart(document.getElementById('polarTypes'), {
+    type: 'polarArea',
+    data: {
+        labels: ['Piccoli (5–10 MW)', 'Medi (10–25 MW)', 'Hyperscale (>25 MW)'],
+        datasets: [{
+            data: [58, 30, 12],
+            backgroundColor: [`${T}55`, `${G}55`, `${O}55`],
+            borderColor: [T, G, O],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        plugins: { legend: { labels: { color: CREAM, font: { size: 10, family: 'Montserrat' }, boxWidth: 11 } } },
+        scales: { r: { ticks: { display: false }, grid: { color: GRID } } },
+        maintainAspectRatio: false
+    }
+});
+
+/* ── 3. LINE — crescita TWh ── */
+new Chart(document.getElementById('lineGrowth'), {
+    type: 'line',
+    data: {
+        labels: ['2022','2023','2024','2025','2026','2027','2028','2029','2030'],
+        datasets: [{
+            data: [333, 375, 439, 510, 600, 700, 780, 860, 945],
+            borderColor: G, backgroundColor: `${G}18`,
+            fill: true, tension: 0.4,
+            pointBackgroundColor: G, pointRadius: 3
+        }]
+    },
+    options: {
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { color: GRID }, ticks: { color: CREAM, font: { size: 9 } } },
+            y: { grid: { color: GRID }, ticks: { color: CREAM, font: { size: 9 }, callback: v => v + ' TWh' } }
+        },
+        maintainAspectRatio: false
+    }
+});
+
+/* ── 4. DOUGHNUT — quota AI su DC al 2028 ── */
+new Chart(document.getElementById('doughnutAI'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Quota AI (>50%)', 'Resto DC (<50%)'],
+        datasets: [{ data: [54, 46], backgroundColor: [`${O}cc`, `${T}44`], borderWidth: 0 }]
+    },
+    options: {
+        plugins: { legend: { labels: { color: CREAM, font: { size: 10 }, boxWidth: 11 } } },
+        cutout: '60%',
+        maintainAspectRatio: false
+    }
+});
+
+/* ── 5. LINE area — potenza cluster addestramento ── */
+new Chart(document.getElementById('lineModels'), {
+    type: 'line',
+    data: {
+        labels: ['GPT-2\n(2019)', 'GPT-3\n(2020)', 'GPT-3.5\n(2022)', 'GPT-4\n(2023)', 'Oggi\n(2024)'],
+        datasets: [{
+            data: [0.3, 0.7, 5, 22, 154],
+            borderColor: T, backgroundColor: `${T}18`,
+            fill: true, tension: 0.35,
+            pointBackgroundColor: T, pointRadius: 4, pointHoverRadius: 6
+        }]
+    },
+    options: {
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.raw} MW` } } },
+        scales: {
+            x: { grid: { color: GRID }, ticks: { color: CREAM, font: { size: 8.5 } } },
+            y: { type: 'logarithmic', grid: { color: GRID }, ticks: { color: CREAM, font: { size: 9 }, callback: v => v + ' MW' } }
+        },
+        maintainAspectRatio: false
+    }
+});
+
+/* ── 6. BAR orizzontale — acqua DC per paese (top 5) ── */
+// Dati: USA ~626 mld L/anno, Cina ~310, India ~95, Germania ~48, Irlanda ~18 (stime IEA/ricerche)
+new Chart(document.getElementById('barWaterCountry'), {
+    type: 'bar',
+    data: {
+        labels: ['USA', 'CHN', 'IND', 'DEU', 'IRL'],
+        datasets: [{
+            label: 'Miliardi di litri/anno',
+            data: [626, 310, 95, 48, 18],
+            backgroundColor: [P, `${P}bb`, `${P}88`, `${P}66`, `${P}44`],
+            borderColor: P,
+            borderWidth: 1,
+            borderRadius: 7,
+            borderSkipped: false
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: c => ` ${c.raw} mld L/anno` } }
+        },
+        scales: {
+            x: { grid: { color: GRID }, ticks: { color: CREAM, font: { size: 9 }, callback: v => v + ' mld L' } },
+            y: { grid: { display: false }, ticks: { color: CREAM, font: { size: 11, family: 'Montserrat' } } }
+        },
+        maintainAspectRatio: false
+    }
+});
+
+/* ── 7. STACKED COLUMN — composizione consumo ChatGPT per fase ── */
+new Chart(document.getElementById('stackedGPT'), {
+    type: 'bar',
+    data: {
+        labels: ['GPT-3', 'GPT-4', 'AI integrata\nin Google (stima)'],
+        datasets: [
+            {
+                label: 'Addestramento',
+                data: [1300, 10000, 180000],
+                backgroundColor: `${O}cc`,
+                borderRadius: 0, stack: 'stack'
+            },
+            {
+                label: 'Raffreddamento',
+                data: [260, 2200, 36000],
+                backgroundColor: `${P}99`,
+                stack: 'stack'
+            },
+            {
+                label: 'Utilizzo annuo (inference)',
+                data: [520, 9800, 26000000],
+                backgroundColor: `${T}bb`,
+                stack: 'stack'
+            }
+        ]
+    },
+    options: {
+        plugins: {
+            legend: { labels: { color: CREAM, font: { size: 9, family: 'Montserrat' }, boxWidth: 11 } },
+            tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${c.raw.toLocaleString()} MWh` } }
+        },
+        scales: {
+            x: { stacked: true, grid: { display: false }, ticks: { color: CREAM, font: { size: 9 } } },
+            y: {
+                stacked: true, type: 'logarithmic',
+                grid: { color: GRID },
+                ticks: { color: CREAM, font: { size: 9 }, callback: v => {
+                    if (v >= 1e6) return (v/1e6) + 'M MWh';
+                    if (v >= 1e3) return (v/1e3) + 'k MWh';
+                    return v + ' MWh';
+                }}
+            }
+        },
+        maintainAspectRatio: false
+    }
+});
+
+/* ── 8. LINE — efficienza chip ── */
+new Chart(document.getElementById('lineChip'), {
+    type: 'line',
+    data: {
+        labels: ['2008','2010','2012','2014','2016','2018','2020','2022','2024'],
+        datasets: [{
+            data: [100, 80, 60, 40, 22, 12, 5, 2, 1],
+            borderColor: O, backgroundColor: `${O}18`,
+            fill: true, tension: 0.4,
+            pointBackgroundColor: O, pointRadius: 3
+        }]
+    },
+    options: {
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { color: GRID }, ticks: { color: CREAM, font: { size: 9 } } },
+            y: { grid: { color: GRID }, ticks: { color: CREAM, font: { size: 9 }, callback: v => v + '%' } }
+        },
+        maintainAspectRatio: false
+    }
+});
+
+/* ── 9. DOUGHNUT — 3 componenti AI ── */
+new Chart(document.getElementById('doughnutComponents'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Addestramento', 'Utilizzo (Inference)', 'Ausiliari DC'],
+        datasets: [{ data: [45, 35, 20], backgroundColor: [`${T}cc`, `${G}cc`, `${P}99`], borderWidth: 0 }]
+    },
+    options: {
+        plugins: { legend: { labels: { color: CREAM, font: { size: 10 }, boxWidth: 11 } } },
+        cutout: '55%',
+        maintainAspectRatio: false
+    }
+});
+
+/* ── 10. BAR verticale log — generazione per tipo output ── */
+new Chart(document.getElementById('barGeneration'), {
+    type: 'bar',
+    data: {
+        labels: ['Testo\nbreve', 'Testo\nlungo', 'Immagine\nbassa res', 'Immagine\nalta res', 'Video\n6s HD', 'Video\n6s 4K'],
+        datasets: [{
+            data: [0.15, 0.5, 1, 2, 20, 100],
+            backgroundColor: [G, G, T, T, O, O],
+            borderRadius: 6, borderSkipped: false
+        }]
+    },
+    options: {
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.raw} Wh` } } },
+        scales: {
+            x: { grid: { display: false }, ticks: { color: CREAM, font: { size: 8.5 } } },
+            y: { type: 'logarithmic', grid: { color: GRID }, ticks: { color: CREAM, font: { size: 9 }, callback: v => v + ' Wh' } }
+        },
+        maintainAspectRatio: false
+    }
+});
+
+/* ── 12. BAR orizzontale log — tutti 20 modelli ── */
+const chatbots = [
+    { name: 'Sora AI',               wh: 125.00 },
+    { name: 'Stable Diffusion',      wh: 2.50   },
+    { name: 'Canva (Magic Media)',   wh: 2.20   },
+    { name: 'DALL·E 3',              wh: 1.10   },
+    { name: 'Gamma',                 wh: 0.85   },
+    { name: 'Perplexity',            wh: 0.65   },
+    { name: 'AI Overview (Google)',  wh: 0.58   },
+    { name: 'NotebookLM',            wh: 0.55   },
+    { name: 'Grok',                  wh: 0.52   },
+    { name: 'Prezi (IA Design)',     wh: 0.45   },
+    { name: 'Claude (Anthropic)',    wh: 0.40   },
+    { name: 'Copilot (Microsoft)',   wh: 0.38   },
+    { name: 'ChatGPT',               wh: 0.34   },
+    { name: 'Astra AI',              wh: 0.30   },
+    { name: 'DeepSeek',              wh: 0.28   },
+    { name: 'Gemini',                wh: 0.24   },
+    { name: 'Agent (VS Code)',       wh: 0.22   },
+    { name: 'Gauth',                 wh: 0.20   },
+    { name: 'ChefG (GialloZafferano)', wh: 0.18 },
+    { name: 'SchoolGPT',             wh: 0.15   },
+];
+
+new Chart(document.getElementById('barModels'), {
+    type: 'bar',
+    data: {
+        labels: chatbots.map(c => c.name),
+        datasets: [{
+            data: chatbots.map(c => c.wh),
+            backgroundColor: chatbots.map(c => c.wh >= 1 ? O : c.wh >= 0.4 ? T : G),
+            borderRadius: 7, borderSkipped: false
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: c => ` ${c.raw} Wh` } }
+        },
+        scales: {
+            x: { type: 'logarithmic', grid: { color: GRID }, ticks: { color: CREAM, font: { size: 10 }, callback: v => v + ' Wh' } },
+            y: { grid: { display: false }, ticks: { color: CREAM, font: { size: 11, family: 'Montserrat' } } }
+        },
+        maintainAspectRatio: false
+    }
+});
+</script>
+</body>
+</html>

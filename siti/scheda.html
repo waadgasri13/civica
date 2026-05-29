@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crea la tua scheda</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #050505;
+            color: #e5e7eb;
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        header h1 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 70px;
+            letter-spacing: 3px;
+            background: linear-gradient(0deg, #ff4d00, #ffae00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-weight: 300;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #ff4d00;
+            font-weight: 700;
+        }
+
+        input, select {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #1a1a1a;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #ff4d00, #ff8000);
+            color: white;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 77, 0, 0.4);
+        }
+
+        .day {
+            background: #181818;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 1px solid #222;
+        }
+
+        .day-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 32px;
+            color: #ff4d00;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #333;
+        }
+
+        .exercise {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            padding: 10px 0;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .exercise span {
+            color: #ffae00;
+            font-weight: 700;
+            background: rgba(255,174,0,0.1);
+            padding: 2px 8px;
+            border-radius: 5px;
+        }
+
+        .info-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .kcal-tag {
+            background: #222;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .kcal-tag b { color: #ff4d00; }
+
+        /* Stili specifici per il PDF (verranno applicati via JS) */
+        .pdf-mode {
+            color: #000 !important;
+            background: white !important;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Crea la tua scheda</h1>
+    <p>Fuel your ambition</p>
+</header>
+
+<div class="container">
+    <div class="card">
+        <div class="grid">
+            <div class="input-group"><label>Sesso</label><select id="gender"><option value="uomo">Uomo</option><option value="donna">Donna</option></select></div>
+            <div class="input-group"><label>Età</label><input type="number" id="age" placeholder="Età"></div>
+            <div class="input-group"><label>Altezza (cm)</label><input type="number" id="height" placeholder="cm"></div>
+            <div class="input-group"><label>Peso (kg)</label><input type="number" id="weight" placeholder="kg"></div>
+            <div class="input-group"><label>Obiettivo</label><select id="goal"><option value="massa">Massa Muscolare</option><option value="forza">Forza</option><option value="definizione">Definizione</option></select></div>
+            <div class="input-group"><label>Livello</label><select id="level"><option value="neofita">Neofita</option><option value="intermedio">Intermedio</option><option value="avanzato">Avanzato</option></select></div>
+            <div class="input-group"><label>Frequenza</label><select id="days"><option value="3">3 Giorni</option><option value="4">4 Giorni</option><option value="5">5 Giorni</option></select></div>
+        </div>
+        <button onclick="generateWorkout()">Genera Programma 🔥</button>
+        <button onclick="downloadPDF()" style="background: #333; margin-top: 10px;">Scarica PDF 📄</button>
+    </div>
+
+    <div id="output"></div>
+</div>
+
+<script>
+const exercises = {
+    push:["Panca Piana","Chest Press","Dip alle parallele","Shoulder Press","Alzate Laterali","Tricep Pushdown","Croci cavi alti"],
+    pull:["Lat Machine avanti","Trazioni","Rematore manubrio","Pulley basso","Face Pull","Curl Bilanciere","Hammer Curl"],
+    upper:["Panca Piana","Rematore","Shoulder Press","Lat Machine","Curl","Dips","Panca Inclinata"],
+    legs:["Squat","Hip Thrust","Leg Press 45°","Affondi","Leg Curl","Calf Raise","Leg Extension"],
+    glute:["Hip Thrust","Glute Bridge","Stacco Rumeno","Abductor Machine","Affondi Bulgari"]
+};
+
+function generateWorkout(){
+    const gender=document.getElementById("gender").value;
+    const goal=document.getElementById("goal").value;
+    const level=document.getElementById("level").value;
+    const days=parseInt(document.getElementById("days").value);
+    const weight=parseFloat(document.getElementById("weight").value);
+    const height=parseFloat(document.getElementById("height").value);
+    const age=parseInt(document.getElementById("age").value);
+
+    if(!weight || !height || !age) { alert("Compila tutti i campi!"); return; }
+
+    // Calcolo BMR e TDEE (Semplificato)
+    let bmr = (gender==="uomo") ? (10*weight + 6.25*height - 5*age + 5) : (10*weight + 6.25*height - 5*age - 161);
+    let tdee = Math.round(bmr * 1.4); 
+    if(goal==="massa") tdee += 300; else if(goal==="definizione") tdee -= 400;
+
+    // Calcolo Consumo Allenamento (Basato su MET medio 6.0 per 75 min)
+    let workoutBurn = Math.round((6.0 * 3.5 * weight / 200) * 75);
+
+    let split = (gender==="uomo") ? 
+        (days===3?["upper","legs","upper"]:days===4?["push","pull","legs","upper"]:["push","pull","legs","push","pull"]) :
+        (days===3?["legs","upper","legs"]:days===4?["legs","upper","legs","glute"]:["legs","upper","glute","legs","upper"]);
+
+    let numEx = level === "neofita" ? 5 : level === "intermedio" ? 6 : 8;
+    
+    let html = `<h2 style="text-align:center; margin-bottom:20px; font-family:'Bebas Neue'">IL TUO PIANO DI BATTAGLIA</h2>`;
+
+    split.forEach((type, i) => {
+        html += `<div class="day">
+            <div class="day-title">GIORNO ${i+1} - ${type.toUpperCase()}</div>
+            <div class="exercise">Riscaldamento Dinamico <span>5-10 min</span></div>`;
+        
+        let selected = [...exercises[type]].sort(() => 0.5 - Math.random()).slice(0, numEx);
+        selected.forEach(ex => {
+            let scheme = (goal==="forza") ? "5x5" : (goal==="massa") ? "4x8" : "3x15";
+            if(level==="avanzato") scheme = scheme.replace("3x","4x").replace("4x","5x");
+            html += `<div class="exercise">🔥 ${ex} <span>${scheme}</span></div>`;
+        });
+
+        html += `<div class="info-box">
+            <div class="kcal-tag">Fabbisogno Giornaliero: <b>${tdee} kcal</b></div>
+            <div class="kcal-tag">Consumo questa sessione: <b>~${workoutBurn} kcal</b></div>
+        </div></div>`;
+    });
+
+    document.getElementById("output").innerHTML = html;
+}
+
+function downloadPDF(){
+    const content = document.getElementById("output");
+    if(!content.innerHTML) { alert("Genera prima la scheda!"); return; }
+
+    // Prepariamo un clone pulito per il PDF
+    const element = document.createElement('div');
+    element.innerHTML = content.innerHTML;
+    element.style.padding = "20px";
+    element.style.color = "#000000"; // Testo Nero
+    element.style.fontFamily = "Arial, sans-serif";
+
+    // Applichiamo stile nero a tutti i testi nel clone
+    element.querySelectorAll('*').forEach(el => {
+        el.style.color = "black";
+        if(el.classList.contains('day')) {
+            el.style.backgroundColor = "#fff";
+            el.style.border = "1px solid #ccc";
+            el.style.marginBottom = "20px";
+            el.style.pageBreakInside = "avoid";
+        }
+        if(el.classList.contains('day-title')) {
+            el.style.borderBottom = "2px solid red";
+        }
+        if(el.classList.contains('kcal-tag')) {
+            el.style.backgroundColor = "#f0f0f0";
+            el.style.border = "1px solid #ddd";
+        }
+    });
+
+    const opt = {
+        margin: 10,
+        filename: 'la-tua-scheda.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
+</script>
+
+</body>
+</html>

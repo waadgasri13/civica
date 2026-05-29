@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI & Sport — La Rivoluzione Silenziosa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f2eb;
+    --electric: #c8f53c;
+    --red: #e63b2e;
+    --gray: #1e1e1e;
+    --muted: #6b6b6b;
+    --border: rgba(245,242,235,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 3rem;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    background: rgba(10,10,10,0.7);
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.12em;
+    color: var(--electric);
+  }
+
+  .nav-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    padding: 0 3rem;
+    padding-top: 8rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg-num {
+    position: absolute;
+    right: -2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(14rem, 32vw, 30rem);
+    color: rgba(200,245,60,0.04);
+    pointer-events: none;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .hero-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--electric);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--electric);
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 12vw, 11rem);
+    line-height: 0.92;
+    letter-spacing: 0.01em;
+    max-width: 16ch;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-title em {
+    color: var(--electric);
+    font-style: normal;
+    display: block;
+  }
+
+  .hero-subtitle {
+    max-width: 540px;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: rgba(245,242,235,0.6);
+    margin-top: 2.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 3rem;
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .stat-pill {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .stat-pill .num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    color: var(--electric);
+    line-height: 1;
+  }
+
+  .stat-pill .label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: var(--electric);
+    color: var(--black);
+    padding: 0.9rem 2rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+
+  .hero-cta:hover { background: var(--white); }
+
+  /* ── SECTION BASE ── */
+  section {
+    padding: 6rem 3rem;
+    position: relative;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+  }
+
+  .section-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 5vw, 4rem);
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .section-title span { color: var(--electric); }
+
+  /* ── INTRO BAND ── */
+  .intro-band {
+    background: var(--gray);
+    padding: 4rem 3rem;
+    border-top: 2px solid var(--electric);
+    border-bottom: 2px solid var(--electric);
+  }
+
+  .intro-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    line-height: 1.45;
+    max-width: 800px;
+    font-style: italic;
+    color: var(--white);
+  }
+
+  .intro-quote strong { color: var(--electric); font-style: normal; }
+
+  .intro-source {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+
+  .intro-source::before {
+    content: '//';
+    color: var(--electric);
+  }
+
+  /* ── CARDS GRID ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .card {
+    background: var(--black);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+
+  .card:hover { background: var(--gray); }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--electric);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.3s;
+  }
+
+  .card:hover::before { transform: scaleY(1); }
+
+  .card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.8rem;
+    color: var(--electric);
+  }
+
+  .card-text {
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: rgba(245,242,235,0.65);
+  }
+
+  .card-source {
+    margin-top: 1.5rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+  }
+
+  /* ── CASE STUDIES ── */
+  .cases-section { background: var(--gray); }
+
+  .cases-list { display: flex; flex-direction: column; gap: 0; }
+
+  .case-item {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    padding: 2.5rem 0;
+    border-bottom: 1px solid var(--border);
+    transition: all 0.2s;
+    cursor: default;
+  }
+
+  .case-item:hover { background: rgba(200,245,60,0.03); padding-left: 1rem; }
+
+  .case-item:last-child { border-bottom: none; }
+
+  .case-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    color: rgba(200,245,60,0.2);
+    line-height: 1;
+  }
+
+  .case-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 0.4rem;
+  }
+
+  .case-tag {
+    display: inline-block;
+    background: rgba(200,245,60,0.12);
+    color: var(--electric);
+    padding: 0.2rem 0.6rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .case-desc {
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: rgba(245,242,235,0.6);
+  }
+
+  /* ── MARKET ── */
+  .market-section { padding: 6rem 3rem; }
+
+  .market-bar-container {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .bar-item { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  .bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-family: 'IBM Plex Mono', monospace;
+    color: rgba(245,242,235,0.6);
+    letter-spacing: 0.1em;
+  }
+
+  .bar-label strong { color: var(--white); }
+
+  .bar-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--electric), rgba(200,245,60,0.4));
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: fillBar 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes fillBar {
+    to { transform: scaleX(1); }
+  }
+
+  .market-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .market-big-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 3rem;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .market-big-stat::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(200,245,60,0.15), transparent 70%);
+    pointer-events: none;
+  }
+
+  .big-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    color: var(--electric);
+    line-height: 1;
+  }
+
+  .big-label {
+    font-size: 0.85rem;
+    color: rgba(245,242,235,0.6);
+    line-height: 1.6;
+    max-width: 260px;
+  }
+
+  /* ── ETHICS ── */
+  .ethics-section {
+    background: #0f0f0a;
+    border-top: 1px solid var(--border);
+  }
+
+  .ethics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+
+  .ethics-col h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .ethics-col.pro h3::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: var(--electric);
+    display: block;
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  }
+
+  .ethics-col.con h3::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: var(--red);
+    display: block;
+    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+  }
+
+  .ethics-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+    align-items: flex-start;
+  }
+
+  .ethics-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-top: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .pro .ethics-dot { background: var(--electric); }
+  .con .ethics-dot { background: var(--red); }
+
+  .ethics-text {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: rgba(245,242,235,0.65);
+  }
+
+  /* ── SOURCES ── */
+  .sources-section { padding: 4rem 3rem; border-top: 1px solid var(--border); }
+
+  .sources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 2rem;
+  }
+
+  .source-item {
+    background: var(--black);
+    padding: 1.5rem;
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
+  .source-item a {
+    color: var(--electric);
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    display: block;
+    margin-top: 0.4rem;
+    word-break: break-all;
+  }
+
+  .source-item a:hover { text-decoration: underline; }
+
+  .source-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--electric);
+    letter-spacing: 0.2em;
+    margin-bottom: 0.4rem;
+  }
+
+  .source-label {
+    color: var(--white);
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+  }
+
+  .source-desc {
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--gray);
+    padding: 2rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    color: var(--electric);
+    letter-spacing: 0.12em;
+  }
+
+  .footer-info {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.1em;
+    line-height: 1.6;
+    text-align: right;
+  }
+
+  /* ── SCROLL ANIMATIONS ── */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── TICKER ── */
+  .ticker-wrap {
+    overflow: hidden;
+    background: var(--electric);
+    padding: 0.6rem 0;
+    white-space: nowrap;
+  }
+
+  .ticker-inner {
+    display: inline-flex;
+    animation: ticker 30s linear infinite;
+  }
+
+  .ticker-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.12em;
+    color: var(--black);
+    padding: 0 2.5rem;
+  }
+
+  .ticker-sep {
+    color: rgba(0,0,0,0.3);
+  }
+
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .hero { padding: 0 1.5rem; padding-top: 7rem; }
+    section { padding: 4rem 1.5rem; }
+    .intro-band { padding: 3rem 1.5rem; }
+    .case-item { grid-template-columns: 50px 1fr; }
+    .case-item .case-desc { display: none; }
+    .market-grid { grid-template-columns: 1fr; }
+    .ethics-grid { grid-template-columns: 1fr; }
+    .hero-bottom { justify-content: flex-start; gap: 2rem; }
+    footer { flex-direction: column; text-align: center; }
+    .footer-info { text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">AI × SPORT</div>
+  <div class="nav-tag">Speciale AI nello sport </div>
+</nav>
+
+<!-- TICKER -->
+<div style="margin-top: 64px;" class="ticker-wrap">
+  <div class="ticker-inner">
+    <span class="ticker-item">ANALISI DELLE PERFORMANCE</span><span class="ticker-item ticker-sep">◆</span>
+    <span class="ticker-item">PREVENZIONE INFORTUNI</span><span class="ticker-item ticker-sep">◆</span>
+    <span class="ticker-item">TALENT SCOUTING</span><span class="ticker-item ticker-sep">◆</span>
+    <span class="ticker-item">ARBITRAGGIO DIGITALE</span><span class="ticker-item ticker-sep">◆</span>
+    <span class="ticker-item">FAN ENGAGEMENT</span><span class="ticker-item ticker-sep">◆</span>
+    <span class="ticker-item">OLIMPIADI PARIGI 2024</span><span class="ticker-item ticker-sep">◆</span>
+    <span class="ticker-item">BIOMECCANICA AI</span><span class="ticker-item ticker-sep">◆</span>
+    <span class="ticker-item">MERCATO €60 MLD</span><span class="ticker-item ticker-sep">◆</span>
+    <!-- clone per loop continuo -->
+    <span class="ticker-item">ANALISI DELLE PERFORMANCE</span><span class="ticker-item ticker-sep">◆</span>
+    <span class="ticker-item">PREVENZIONE INFORTUNI</span><span class="ticker-item ticker-sep">◆</span>
+    <span class="ticker-item">TALENT SCOUTING</span><span class="ticker-item ticker-sep">◆</span>
+    <span class="ticker-item">ARBITRAGGIO DIGITALE</span><span class="ticker-item ticker-sep">◆</span>
+    <span class="ticker-item">FAN ENGAGEMENT</span><span class="ticker-item ticker-sep">◆</span>
+    <span class="ticker-item">OLIMPIADI PARIGI 2024</span><span class="ticker-item ticker-sep">◆</span>
+    <span class="ticker-item">BIOMECCANICA AI</span><span class="ticker-item ticker-sep">◆</span>
+    <span class="ticker-item">MERCATO €60 MLD</span><span class="ticker-item ticker-sep">◆</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="hero-eyebrow">La rivoluzione silenziosa dello sport</div>
+    <h1 class="hero-title">
+      Intelligenza<br>
+      <em>Artificiale</em>
+      nello Sport</br>
+    </h1>
+    <p class="hero-subtitle">
+      Dall'analisi biomeccanica alla prevenzione degli infortuni, dal talent scouting all'arbitraggio: l'AI sta riscrivendo le regole del gioco in ogni disciplina sportiva.
+    </p>
+  </div>
+  <div class="hero-bg-num">AI</div>
+  <div class="hero-bottom">
+    <div class="stat-pill">
+      <span class="num">€60B</span>
+      <span class="label">Mercato AI sport 2034</span>
+    </div>
+    <div class="stat-pill">
+      <span class="num">+500%</span>
+      <span class="label">Crescita vs 2024</span>
+    </div>
+    <div class="stat-pill">
+      <span class="num">21%</span>
+      <span class="label">CAGR annuale</span>
+    </div>
+    <a href="#applicazioni" class="hero-cta">Esplora ↓</a>
+  </div>
+</section>
+
+<!-- INTRO QUOTE -->
+<div class="intro-band">
+  <blockquote class="intro-quote">
+    «L'intelligenza artificiale aiuta i professionisti del settore a concentrarsi sulle prestazioni, evitando che <strong>fattori fisici influenzino la scelta dei talenti</strong>, creando uno sport più equo e meritocratico.»
+  </blockquote>
+  <div class="intro-source">Precedence Research via Ninja Marketing, 2025 — ninja.it</div>
+</div>
+
+<!-- APPLICAZIONI -->
+<section id="applicazioni">
+  <div class="section-header fade-in">
+    <span class="section-num">01 //</span>
+    <h2 class="section-title">Le <span>Applicazioni</span></h2>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card fade-in">
+      <span class="card-icon">📊</span>
+      <div class="card-title">Analisi delle Performance</div>
+      <p class="card-text">Algoritmi di machine learning e reti neurali analizzano i dati degli atleti — statistiche di gioco e dati biometrici — per identificare pattern e tendenze invisibili all'occhio umano. Nel calcio, l'AI analizza i movimenti dei giocatori per determinare abitudini, punti di forza e aree di debolezza.</p>
+      <div class="card-source">FONTE: ITS Prodigy, 2024 — itsprodigy.com</div>
+    </div>
+
+    <div class="card fade-in">
+      <span class="card-icon">🦴</span>
+      <div class="card-title">Prevenzione Infortuni</div>
+      <p class="card-text">I sistemi AI analizzano il modo in cui gli atleti si muovono in campo per costruire predizioni sugli infortuni prima ancora che si verifichino. Sensori wearable e algoritmi di machine learning monitorano in tempo reale parametri fisici critici, permettendo interventi preventivi.</p>
+      <div class="card-source">FONTE: FIF — Federazione Italiana Fitness / NIH/PMC, 2024</div>
+    </div>
+
+    <div class="card fade-in">
+      <span class="card-icon">🔍</span>
+      <div class="card-title">Talent Scouting</div>
+      <p class="card-text">L'AI sta rivoluzionando il talent scouting sportivo, in particolare nei settori giovanili e universitari. Sistemi di analisi avanzata permettono di valutare il potenziale atletico in modo più oggettivo, democratizzando l'accesso a strumenti che un tempo erano disponibili solo per atleti olimpici.</p>
+      <div class="card-source">FONTE: Università Niccolò Cusano, Marzo 2025 — unicusano.it</div>
+    </div>
+
+    <div class="card fade-in">
+      <span class="card-icon">🏁</span>
+      <div class="card-title">Arbitraggio Digitale</div>
+      <p class="card-text">L'intelligenza artificiale sta assumendo un ruolo sempre più rilevante nell'assistenza ai direttori di gara. Sistemi di visione artificiale e analisi in tempo reale riducono gli errori umani nelle decisioni arbitrali, migliorando fairness e trasparenza nelle competizioni ad alto livello.</p>
+      <div class="card-source">FONTE: AI4Business — ai4business.it / Tesi Università CONI, 2024</div>
+    </div>
+
+    <div class="card fade-in">
+      <span class="card-icon">📡</span>
+      <div class="card-title">Fan Engagement</div>
+      <p class="card-text">Nuovi sistemi di infografica AI rendono l'esperienza sportiva più coinvolgente per atleti, allenatori e fan. A Wimbledon 2024 verrà introdotto un assistente AI interattivo per rispondere in tempo reale ai fan durante le partite. Contenuti personalizzati e biglietteria automatizzata completano il quadro.</p>
+      <div class="card-source">FONTE: Ninja Marketing, 2025 / ISFestival — Informatici Senza Frontiere</div>
+    </div>
+
+    <div class="card fade-in">
+      <span class="card-icon">🧬</span>
+      <div class="card-title">Biomeccanica & Wearable</div>
+      <p class="card-text">Intel's 3D Athlete Tracking (3DAT) traccia i movimenti degli atleti in tempo reale, offrendo insights biomeccanici critici per ottimizzare performance e allenamento. Smartring, auricolari intelligenti e smartglass completano l'ecosistema di dispositivi AI indossabili per lo sport professionistico.</p>
+      <div class="card-source">FONTE: NIH/PMC — Paris 2024 Olympics AI Integration</div>
+    </div>
+  </div>
+</section>
+
+<!-- CASE STUDIES -->
+<section class="cases-section">
+  <div style="padding: 0;">
+    <div class="section-header fade-in">
+      <span class="section-num">02 //</span>
+      <h2 class="section-title">Casi <span>Reali</span></h2>
+    </div>
+
+    <div class="cases-list">
+      <div class="case-item fade-in">
+        <div class="case-num">01</div>
+        <div>
+          <div class="case-title">Olimpiadi di Parigi 2024</div>
+          <span class="case-tag">Olimpiadi</span>
+        </div>
+        <div class="case-desc">Il CIO ha lanciato l'"Olympic AI Agenda", definendo l'impatto dell'AI sull'ecosistema olimpico. Tra le applicazioni: AthleteGPT, un chatbot h24 per gli atleti, e sistemi AI per l'identificazione dei futuri olimpionici attraverso valutazioni del potenziale atletico.</div>
+      </div>
+
+      <div class="case-item fade-in">
+        <div class="case-num">02</div>
+        <div>
+          <div class="case-title">Wimbledon AI Assistant</div>
+          <span class="case-tag">Tennis</span>
+        </div>
+        <div class="case-desc">Il torneo di Wimbledon ha introdotto un assistente AI interattivo che risponde in tempo reale ai fan durante le partite. Un esempio concreto di come l'intelligenza artificiale stia trasformando l'esperienza degli spettatori nel tennis professionistico.</div>
+      </div>
+
+      <div class="case-item fade-in">
+        <div class="case-num">03</div>
+        <div>
+          <div class="case-title">NBA, NFL & Major League</div>
+          <span class="case-tag">USA Sports</span>
+        </div>
+        <div class="case-desc">Negli Stati Uniti l'hi-tech è già applicata ai più popolari sport professionistici — basket, baseball, football americano, hockey su ghiaccio — per analizzare enormi quantità di dati e ottimizzare strategie di gioco, scouting e gestione degli atleti.</div>
+      </div>
+
+      <div class="case-item fade-in">
+        <div class="case-num">04</div>
+        <div>
+          <div class="case-title">Calcio: Analisi Tattica</div>
+          <span class="case-tag">Football</span>
+        </div>
+        <div class="case-desc">L'AI analizza i movimenti di ogni giocatore in campo per determinare abitudini, punti di forza e debolezze. Questo consente agli allenatori di personalizzare i programmi di allenamento e sviluppare strategie di squadra più efficaci, con un impatto diretto sui risultati in campo.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MERCATO -->
+<section class="market-section">
+  <div class="section-header fade-in">
+    <span class="section-num">03 //</span>
+    <h2 class="section-title">Il <span>Mercato</span></h2>
+  </div>
+
+  <div class="market-grid fade-in">
+    <div>
+      <div class="market-big-stat" style="margin-bottom: 1.5rem;">
+        <div class="big-num">€60B</div>
+        <div class="big-label">Valore atteso del mercato globale AI sportiva entro il 2034 (Precedence Research)</div>
+      </div>
+      <div class="market-big-stat">
+        <div class="big-num">+21%</div>
+        <div class="big-label">CAGR annuale medio di crescita del settore AI applicata allo sport</div>
+      </div>
+    </div>
+
+    <div>
+      <p style="font-size: 0.85rem; color: rgba(245,242,235,0.5); letter-spacing: 0.15em; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; margin-bottom: 2rem;">Distribuzione Geografica del Mercato</p>
+      <div class="market-bar-container">
+        <div class="bar-item">
+          <div class="bar-label"><strong>Nord America</strong><span>35%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width: 35%; animation-delay: 0.1s;"></div></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label"><strong>Europa</strong><span>24%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width: 24%; animation-delay: 0.3s;"></div></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label"><strong>Asia</strong><span>22%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width: 22%; animation-delay: 0.5s;"></div></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label"><strong>Resto del Mondo</strong><span>19%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width: 19%; animation-delay: 0.7s;"></div></div>
+        </div>
+      </div>
+      <div style="margin-top: 2rem; padding: 1.5rem; border: 1px solid var(--border);">
+        <p style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 1rem; line-height: 1.6; color: rgba(245,242,235,0.7);">«L'utilizzo dell'intelligenza artificiale nei principali sport sta effettivamente creando euforia ed eccitazione. Praticamente tutte le discipline più praticate vedono nell'AI un alleato per migliorare presente e futuro.»</p>
+        <div class="intro-source" style="margin-top: 1rem;">Gianpaolo Martire, Responsabile Marketing Vero Volley</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ETICA -->
+<section class="ethics-section">
+  <div class="section-header fade-in">
+    <span class="section-num">04 //</span>
+    <h2 class="section-title">Opportunità <span>&</span> Rischi</h2>
+  </div>
+
+  <div class="ethics-grid fade-in">
+    <div class="ethics-col pro">
+      <h3>Opportunità</h3>
+      <div class="ethics-item">
+        <div class="ethics-dot"></div>
+        <p class="ethics-text">Democratizzazione degli strumenti di analisi avanzata, prima riservati solo agli atleti di élite olimpica, ora accessibili a tutti i livelli dello sport.</p>
+      </div>
+      <div class="ethics-item">
+        <div class="ethics-dot"></div>
+        <p class="ethics-text">Selezione dei talenti più equa e meritocratica, svincolata da fattori fisici o bias soggettivi nella valutazione degli atleti.</p>
+      </div>
+      <div class="ethics-item">
+        <div class="ethics-dot"></div>
+        <p class="ethics-text">Riduzione degli infortuni attraverso il monitoraggio preventivo dei parametri fisici in tempo reale con dispositivi wearable connessi all'AI.</p>
+      </div>
+      <div class="ethics-item">
+        <div class="ethics-dot"></div>
+        <p class="ethics-text">Miglioramento della fan experience con contenuti personalizzati, assistenti AI interattivi e nuove forme di infografica sportiva in diretta.</p>
+      </div>
+    </div>
+
+    <div class="ethics-col con">
+      <h3>Rischi</h3>
+      <div class="ethics-item">
+        <div class="ethics-dot"></div>
+        <p class="ethics-text">Raccolta e utilizzo di dati biometrici sensibili degli atleti pone sfide giuridiche sul rispetto della privacy e della tutela dei dati personali.</p>
+      </div>
+      <div class="ethics-item">
+        <div class="ethics-dot"></div>
+        <p class="ethics-text">Il rischio che l'AI esasperi le disuguaglianze tra squadre con grandi budget tecnologici e club con meno risorse economiche.</p>
+      </div>
+      <div class="ethics-item">
+        <div class="ethics-dot"></div>
+        <p class="ethics-text">La dipendenza dagli algoritmi nelle decisioni arbitrali potrebbe ridurre il ruolo umano e generare controversie sulla trasparenza dei sistemi AI.</p>
+      </div>
+      <div class="ethics-item">
+        <div class="ethics-dot"></div>
+        <p class="ethics-text">L'assenza di un quadro normativo internazionale uniforme per l'uso dell'AI nello sport crea zone grigie regolamentari e rischi di abusi.</p>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top: 2rem; padding: 1.5rem; border-left: 3px solid var(--red); background: rgba(230,59,46,0.05);" class="fade-in">
+    <p style="font-size: 0.88rem; line-height: 1.7; color: rgba(245,242,235,0.65);">Lo sport, per sua natura, è un universo complesso in cui valori come il <strong style="color: var(--white);">fair play e la trasparenza</strong> convivono con interessi economici sempre più rilevanti. Introdurre l'IA in questo contesto richiede un approccio equilibrato che metta al centro non solo l'innovazione, ma anche la tutela dei diritti fondamentali nelle diverse sfaccettature del gioco.</p>
+    <div class="intro-source" style="margin-top: 0.8rem;">Studio Legale Bertini, Febbraio 2025 — studiolegalebertini.it</div>
+  </div>
+</section>
+
+<!-- SOURCES -->
+<section class="sources-section">
+  <div class="section-header fade-in">
+    <span class="section-num">05 //</span>
+    <h2 class="section-title" style="font-size: 2rem;">Fonti</h2>
+  </div>
+
+  <div class="sources-grid fade-in">
+    <div class="source-item">
+      <div class="source-num">// 01</div>
+      <div class="source-label">Ninja Marketing</div>
+      <div class="source-desc">Mercato globale AI sport, dati Precedence Research, 2025</div>
+      <a href="https://www.ninja.it/intelligenza-artificiale-nello-sport/" target="_blank">ninja.it →</a>
+    </div>
+    <div class="source-item">
+      <div class="source-num">// 02</div>
+      <div class="source-label">Università Niccolò Cusano</div>
+      <div class="source-desc">AI e sport: tecnologia e formazione professionale, Marzo 2025</div>
+      <a href="https://www.unicusano.it/blog/universita/intelligenza-artificiale-e-sport-come-la-tecnologia-supporta-lallenamento-degli-atleti/" target="_blank">unicusano.it →</a>
+    </div>
+    <div class="source-item">
+      <div class="source-num">// 03</div>
+      <div class="source-label">NIH / PubMed Central</div>
+      <div class="source-desc">AI in sports medicine, Paris 2024 Olympics, 2024</div>
+      <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11445266/" target="_blank">ncbi.nlm.nih.gov →</a>
+    </div>
+    <div class="source-item">
+      <div class="source-num">// 04</div>
+      <div class="source-label">AI4Business</div>
+      <div class="source-desc">Il ruolo crescente dell'AI nello sport, 2024</div>
+      <a href="https://www.ai4business.it/intelligenza-artificiale/ai-manager/il-ruolo-crescente-dellai-nello-sport/" target="_blank">ai4business.it →</a>
+    </div>
+    <div class="source-item">
+      <div class="source-num">// 05</div>
+      <div class="source-label">Studio Legale Bertini</div>
+      <div class="source-desc">IA nello sport tra innovazione e tutela dei diritti, Febbraio 2025</div>
+      <a href="https://www.studiolegalebertini.it/diritto-sportivo/ia-nello-sport-tra-innovazione-e-tutela-dei-diritti/" target="_blank">studiolegalebertini.it →</a>
+    </div>
+    <div class="source-item">
+      <div class="source-num">// 06</div>
+      <div class="source-label">FIF — Federazione Italiana Fitness</div>
+      <div class="source-desc">L'intelligenza artificiale nello sport: wearable e ML</div>
+      <a href="https://www.fif.it/component/k2/item/556-intelligenza-artificiale-sport.html" target="_blank">fif.it →</a>
+    </div>
+    <div class="source-item">
+      <div class="source-num">// 07</div>
+      <div class="source-label">ITS Prodigy</div>
+      <div class="source-desc">AI e sport: analisi performance e prevenzione, 2024</div>
+      <a href="https://www.itsprodigy.com/en/news/2024-07-12-artificial-intelligence-sport/" target="_blank">itsprodigy.com →</a>
+    </div>
+    <div class="source-item">
+      <div class="source-num">// 08</div>
+      <div class="source-label">Intesa</div>
+      <div class="source-desc">Come viene utilizzata l'AI nello sport: Olympic AI Agenda CIO</div>
+      <a href="https://www.intesa.it/come-viene-utilizzata-lai-nello-sport/" target="_blank">intesa.it →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">AI × SPORT</div>
+  <div class="footer-info">
+    Realizzato da Vladimir e Pierluigi <br>
+    Tutte le fonti sono citate e verificabili
+  </div>
+</footer>
+
+<script>
+  // Intersection Observer per fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // Stagger per cards
+  document.querySelectorAll('.cards-grid .card').forEach((card, i) => {
+    card.style.transitionDelay = `${i * 80}ms`;
+  });
+
+  // Avvia animazioni barre quando visibili
+  const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('.bar-fill').forEach(bar => {
+          bar.style.animationPlayState = 'running';
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+
+  const marketSection = document.querySelector('.market-section');
+  if (marketSection) {
+    marketSection.querySelectorAll('.bar-fill').forEach(bar => {
+      bar.style.animationPlayState = 'paused';
+    });
+    barObserver.observe(marketSection);
+  }
+</script>
+</body>
+</html>

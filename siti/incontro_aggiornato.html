@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Dashboard - Istituto Fermi</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- NAVBAR FISSA --- */
+        .navbar-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 85px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px); /* Effetto sfocatura dietro la barra */
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 1000; /* Assicura che stia sopra a tutto */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-logo-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-logo-link:hover {
+            transform: translateX(-5px);
+            color: var(--accent-main);
+        }
+
+        .nav-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 30px;
+            color: var(--accent-purple);
+            font-weight: 600;
+            margin: 0;
+            /* Centratura assoluta nel mezzo della barra */
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* --- COMPENSAZIONE SPAZIO --- */
+        body {
+            padding-top: 90px; /* Evita che il contenuto parta coperto dalla barra */
+        }
+
+        /* Modifica per mobile */
+        @media (max-width: 768px) {
+            .nav-title { display: none; } /* Nasconde il titolo centrale su schermi piccoli per spazio */
+            .navbar-fixed { padding: 0 20px; }
+        }
+        /* --- VARIABILI GLOBALI (Tema Chiaro/Viola) --- */
+        :root {
+            --bg-color: #f8f7fa; /* Bianco sporco / Lilla chiarissimo */
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(138, 43, 226, 0.15); /* Bordo lilla molto tenue */
+            --text-main: #2d1b36; /* Viola scurissimo quasi nero */
+            --text-muted: #6b5a74; /* Grigio-viola per testi secondari */
+            --accent-purple: #7c3aed; /* Viola vibrante */
+            --accent-light: #c4b5fd; /* Lilla chiaro */
+            --accent-gradient: linear-gradient(135deg, #9333ea, #6366f1); /* Sfumatura Viola -> Indaco */
+        }
+
+        /* --- RESET E BASE --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* --- HERO HEADER --- */
+        header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            position: relative;
+        }
+
+        .logo-container {
+            background: rgba(255, 255, 255, 0.95);
+            display: inline-block;
+            padding: 15px 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        
+
+        header h1 {
+            font-size: 60px;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 10px;
+            letter-spacing: -1px;
+        }
+
+        /* --- CONTAINER PRINCIPALE --- */
+        .dashboard-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- COMPONENTE GLASSMORPHISM (Le Card) --- */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(128, 12, 167, 0.4);
+            transform: translateY(-5px);
+        }
+
+        .glass-card h2 {
+            font-size: 24px;
+            color: var(--accent-cyan);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .glass-card p, .glass-card li {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        /* --- LAYOUT A GRIGLIA (Bento Box) --- */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .col-span-12 { grid-column: span 8; }
+        .col-span-6 { grid-column: span 6; }
+        .col-span-4 { grid-column: span 4; }
+        .col-span-8 { grid-column: span 8; }
+
+        @media (max-width: 992px) {
+            .col-span-6, .col-span-4, .col-span-8 { grid-column: span 12; }
+        }
+
+        /* Dati in evidenza */
+        .highlight-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .big-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* --- TABELLE DARK MODE --- */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            min-width: 500px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        th {
+            font-family: 'Outfit', sans-serif;
+            color: var(--accent-cyan);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* --- SISTEMA A TAB PER I GRAFICI (Novità!) --- */
+        .tabs-section {
+            margin-top: 60px;
+            margin-bottom: 40px;
+        }
+
+        .tabs-section h2 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .tabs-nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent-purple);
+        }
+
+        .tab-btn.active {
+            background: var(--accent-gradient);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* --- GRIGLIA GRAFICI IFRAME --- */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Forza esattamente 2 colonne */
+            gap: 30px; /* Spazio leggermente aumentato tra i grafici */
+        }
+
+        /* Regola per schermi più piccoli (tablet e smartphone) */
+        @media (max-width: 992px) {
+            .charts-grid {
+                grid-template-columns: 1fr; /* Passa a 1 singola colonna per non schiacciarli */
+            }
+        }
+
+        iframe {
+            width: 100%;
+            height: 420px; /* Altezza aumentata per bilanciare la nuova larghezza */
+            border: none;
+            border-radius: 15px;
+            background: #fff; /* Lasciato bianco per non rompere il design di Google Sheets */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        iframe:hover {
+            transform: scale(1.03);
+            z-index: 10;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            border-top: 1px solid var(--glass-border);
+            margin-top: 50px;
+            color: var(--text-muted);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* --- ANIMAZIONI --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- STILE BOX INVITO SONDAGGIO --- */
+        .survey-invite-container {
+            margin-top: 50px;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(196, 181, 253, 0.2));
+            border: 2px solid var(--accent-light);
+        }
+
+        .survey-invite-container h3 {
+            font-size: 24px;
+            color: var(--text-main);
+            margin-bottom: 15px;
+        }
+
+        .survey-invite-container p {
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            font-size: 17px;
+        }
+
+        .btn-survey {
+            display: inline-block;
+            padding: 15px 35px;
+            background: var(--accent-gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.2);
+        }
+
+        .btn-survey:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(177, 58, 237, 0.4);
+            filter: brightness(1.1);
+        }
+        
+        /* --- BOX STATISTICHE (Aggiornato per 3 colonne fisse) --- */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Forza esattamente 3 colonne */
+            gap: 25px;
+            width: 100%;
+            margin: 40px 0; /* Spazio sopra e sotto */
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-purple);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            background: var(--accent-gradient);
+            color: white;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .stat-card h4 {
+            font-size: 1.2rem;
+            color: var(--text-main);
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .stat-highlight {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-purple);
+            margin: 5px 0 15px 0;
+            display: block;
+        }
+
+        .stat-description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            flex-grow: 1; /* Spinge il badge sempre in basso se i testi hanno lunghezze diverse */
+        }
+
+        .stat-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: rgba(124, 58, 237, 0.1);
+            color: var(--accent-purple);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 20px;
+            align-self: flex-start;
+        }
+
+        /* Se si guarda da cellulare o tablet, li mettiamo in colonna */
+        @media (max-width: 992px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar-fixed">
+    <a href="../index.html" class="nav-logo-link" style="font-size: 18px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        Torna alla Home
+    </a>
+
+    <h1 class="nav-title">Dashboard IA: Analisi e Statistiche</h1>
+
+    <div style="width: 120px;"></div> 
+    </nav>
+
+    <div class="dashboard-container">
+
+        <div class="bento-grid">
+                
+            <div class="glass-card" style="grid-column: span 8;">
+                <h2 style="font-size: 26px; color: var(black); margin-bottom: 15px;">🔍 Esplorando l'impatto dell'IA: Tra Globale e Locale</h2>
+                <p style="font-size: 21px; margin-bottom: 20px;">
+                    L'Intelligenza Artificiale non è più una promessa del futuro, ma un cambiamento antropologico senza precedenti. 
+                    In questo spazio, vengono uniti i dati ricavati da un sondaggio fatto alla comunità scolastica del Liceo Fermi di Aversa con le statistiche globali, con lo scopo di offrire una prospettiva critica, fondamentale per comprendere la nostra evoluzione come cittadini digitali.
+                </p><br>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="padding: 20px; border-left: 4px solid var(--accent-purple); background: rgba(196, 181, 253, 0.1); border-radius: 0 10px 10px 0;">
+                        <p style="margin-bottom: 0;"><b>Metodologia al Fermi:</b> Ho analizzato le risposte di studenti e docenti per verificare se il "Digital Divide" generazionale sia ancora un fattore determinante nella percezione di questa tecnologia.</p>
+                    </div>
+                    <div style="padding: 20px; border-left: 4px solid var(--accent-purple); background: rgba(124, 58, 237, 0.05); border-radius: 0 10px 10px 0;">
+                        <p style="margin-bottom: 0;"><b>Impatto Globale:</b> Con oltre 1.8 miliardi di utenti, l'IA sta trasformando il mercato del lavoro e la gestione dei dati a una velocità superiore a quella di qualsiasi rivoluzione industriale precedente.</p>
+                    </div>
+                </div><br>
+                <p style="margin-top: 20px; font-style: italic; color: var(--text-muted); text-align: right;">— Cristian Sorrentino 5CS</p>
+            </div>
+
+
+            <div class="glass-card col-span-4">
+                <h2>💡 Dati in Pillole</h2>
+                <ul style="list-style-type: none;">
+                    <li style="font-size: 23px;"><span class="big-number"><b>66%</b></span> Delle persone utilizza l'IA regolarmente.</li>
+                    <li style="font-size: 23px;"><span class="big-number"><b>1.8 Mld</b></span> Utenti globali stimati (2025).</li>
+                    <li style="font-size: 23px;"><span class="big-number"><b>78%</b></span> Delle aziende integra l'IA.</li>
+                    <li style="font-size: 23px;"><span class="big-number"><b>92%</b></span> Adozione in India e Nigeria.</li>
+                </ul>
+            </div>
+
+
+
+            <div class="glass-card col-span-6">
+            <h2>🌐 Utenti AI per Paese</h2>
+            <div class="table-container" style="max-height: 350px; overflow-y: auto;">
+                <table style="text-align: center;">
+                    <thead>
+                        <tr>
+                            <th>Paese</th>
+                            <th>Percentuale della popolazione (Uso Regolare)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>India</td><td>92%</td></tr>
+                        <tr><td>Nigeria</td><td>92%</td></tr>
+                        <tr><td>Emirati Arabi Uniti</td><td>91%</td></tr>
+                        <tr><td>Egitto</td><td>90%</td></tr>
+                        <tr><td>Cina</td><td>89%</td></tr>
+                        <tr><td>Sudafrica</td><td>83%</td></tr>
+                        <tr><td>Brasile</td><td>82%</td></tr>
+                        <tr><td>Turchia</td><td>81%</td></tr>
+                        <tr><td>Messico</td><td>77%</td></tr>
+                        <tr><td>Singapore</td><td>73%</td></tr>
+                        <tr><td>Stati Uniti</td><td>53%</td></tr>
+                        <tr><td>Regno Unito</td><td>52%</td></tr>
+                        <tr><td>Germania</td><td>51%</td></tr>
+                        <tr><td>Giappone</td><td>50%</td></tr>
+                        <tr><td>Svezia</td><td>47%</td></tr>
+                        <tr><td>Paesi Bassi</td><td>43%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            </div>
+    
+            
+
+            <div class="glass-card col-span-6">
+                <h2>🚀 Top AI Tools (Utenti Mensili)</h2>
+                <div class="table-container" style="max-height: 350px; overflow-y: auto;">
+                    <table>
+                        <thead><tr><th>Tool</th><th>Utenti</th></tr></thead>
+                        <tbody>
+                            <tr><td>ChatGPT (OpenAI)</td><td>2,8 Miliardi</td></tr>
+                            <tr><td>Google AI Overview</td><td>2 Miliardi</td></tr>
+                            <tr><td>Meta AI</td><td>1 Miliardo</td></tr>
+                            <tr><td>Google Gemini</td><td>450 Milioni</td></tr>
+                            <tr><td>Canva AI</td><td>220 Milioni</td></tr>
+                            <tr><td>Microsoft Copilot</td><td>30 Milioni</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+</div> <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">💼</div>
+                    <h4>Lavoro & Imprese</h4>
+                </div>
+                <span class="stat-highlight">15%</span>
+                <p class="stat-description">
+                    L'adozione dell'IA nelle imprese italiane è raddoppiata dal 2021. Le aziende automatizzano lo screening dei CV, ma il 55,1% fatica a trovare esperti digitali.
+                </p>
+                <span class="stat-badge">Fonte: Istat 2024/25</span>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">🎓</div>
+                    <h4>Studio & Competenze</h4>
+                </div>
+                <span class="stat-highlight">45,9%</span>
+                <p class="stat-description">
+                    Solo una minoranza possiede competenze digitali di base. L'IA sta personalizzando il metodo di studio, rendendo la formazione continua vitale.
+                </p>
+                <span class="stat-badge">Dato Nazionale 2025</span>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">📱</div>
+                    <h4>Filtri Informativi</h4>
+                </div>
+                <span class="stat-highlight">70%</span>
+                <p class="stat-description">
+                    Sette giovani su dieci si informano tramite algoritmi di raccomandazione. La trasparenza è l'unica arma contro i bias e la disinformazione.
+                </p>
+                <span class="stat-badge">Tendenza Social 2025</span>
+            </div>
+        </div>
+        <div class="tabs-section">
+
+
+
+        </div>
+
+        <div class="tabs-section">
+            <h2 style="color: var(--accent-purple);">Esplora i Risultati del Sondaggio</h2>
+
+             <div class="glass-card col-span-12" style="margin-top: 20px">
+                <h2 style="color: var(--accent-purple); font-size: 22px;">📊 Il "Dietro le Quinte" della Ricerca</h2>
+                <p style="margin-bottom: 15px; margin-top: -20px">Per garantire il rigore scientifico dell'analisi presentata in questa dashboard, il progetto si è articolato secondo le seguenti fasi:</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="padding: 15px; border-left: 4px solid var(--accent-purple); background: rgba(196, 181, 253, 0.1); border-radius: 0 10px 10px 0;">
+                        <p><strong>👥 Il Campione:</strong></p>
+                        <p style="font-size: 15px;">La ricerca ha coinvolto una base ampissima di <strong>oltre 650 rispondenti</strong> tra studenti e docenti dell'Istituto Fermi, rendendo il dato statisticamente rilevante per l'intera comunità scolastica.</p>                    </div>
+                    <div style="padding: 15px; border-left: 4px solid var(--accent-purple); background: rgba(124, 58, 237, 0.05); border-radius: 0 10px 10px 0;">
+                        <p><strong>🛠️ Strumento e Privacy:</strong></p>
+                        <p style="font-size: 15px;">È stato utilizzato <strong>Google Moduli</strong> per la somministrazione. I dati sono stati trattati esclusivamente in <strong>forma anonima</strong>, nel pieno rispetto della privacy, per trasformare le singole opinioni in tendenze sociologiche.</p>                    </div>
+                </div>
+            </div>
+            
+            <br>
+            
+            
+            <div class="tabs-nav">
+                <button class="tab-btn active" data-target="tab-docenti">Docenti</button>
+                <button class="tab-btn" data-target="tab-1anno">1° Anno</button>
+                <button class="tab-btn" data-target="tab-2anno">2° Anno</button>
+                <button class="tab-btn" data-target="tab-3anno">3° Anno</button>
+                <button class="tab-btn" data-target="tab-4anno">4° Anno</button>
+                <button class="tab-btn" data-target="tab-5anno">5° Anno</button>
+            </div>
+
+            <div id="tab-docenti" class="tab-pane active">
+                <div class="charts-grid">
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1418013933&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=673898549&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=28634507&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1538757775&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=251589187&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=809352374&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1302977&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1880926403&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1665817002&amp;format=interactive"></iframe>
+                </div>
+            </div>
+
+            <div id="tab-1anno" class="tab-pane">
+                <div class="charts-grid">
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1747013409&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=946166420&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1989266123&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=376723671&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=2045541114&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=899368305&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=396008492&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1055412052&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1964324939&amp;format=interactive"></iframe>
+                </div>
+            </div>
+
+            <div id="tab-2anno" class="tab-pane">
+                <div class="charts-grid">
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1306274298&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=352039609&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=2105763338&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1608347446&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=2095410025&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1034573796&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1058962659&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1346195837&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1810772640&amp;format=interactive"></iframe>
+                </div>
+            </div>
+
+            <div id="tab-3anno" class="tab-pane">
+                <div class="charts-grid">
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1392597913&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1789302125&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1081118877&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=2137047456&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=2021000648&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1263827933&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=651296063&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=870923303&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=204543145&amp;format=interactive"></iframe>
+                </div>
+            </div>
+
+            <div id="tab-4anno" class="tab-pane">
+                <div class="charts-grid">
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=483753059&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1857892060&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=305368406&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=940339854&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=126424273&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=684423728&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=824351737&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1068517024&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1787855331&amp;format=interactive"></iframe>
+                </div>
+            </div>
+
+            <div id="tab-5anno" class="tab-pane">
+                <div class="charts-grid">
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=2070741134&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1933008157&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=633221816&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1681145414&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1307555508&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1629961757&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=473062963&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=1488741865&amp;format=interactive"></iframe>
+                    <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRyFFla10caLzeuc7AQFv4ygsUBaYzeWabOLp8B9zC73jZxcPcvuU6bvsisoavUjdm2wuguF46eOQiQ/pubchart?oid=271623986&amp;format=interactive"></iframe>
+                </div>
+            </div>
+
+            <div class="glass-card survey-invite-container">
+            <h3 style="color: var(--accent-purple)">Diventa parte attiva del progetto!</h3>
+            <p>Sei uno studente o un docente dell'Istituto Fermi e non hai ancora partecipato?<br>
+            Aiutaci a rendere la nostra ricerca ancora più accurata.</p>
+            
+            <a href="https://docs.google.com/forms/d/18y5MYzoEUVtacZS34-kjrVB4iSO97C_wl_LNUM7H_f0/viewform?ts=696517c4&edit_requested=true" target="_blank" class="btn-survey">
+                Partecipa al Sondaggio →
+            </a>
+        </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+        const tabs = document.querySelectorAll('.tab-btn');
+        const panes = document.querySelectorAll('.tab-pane');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Rimuove la classe active da tutti i bottoni e i pannelli
+                tabs.forEach(t => t.classList.remove('active'));
+                panes.forEach(p => p.classList.remove('active'));
+
+                // Aggiunge la classe active al bottone cliccato e al rispettivo pannello
+                tab.classList.add('active');
+                const targetPane = document.getElementById(tab.getAttribute('data-target'));
+                targetPane.classList.add('active');
+            });
+        });
+    </script>
+
+</body>
+</html>

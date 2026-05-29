@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FermiTi Ascolto - Spazio di Benessere</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.4);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            background: #fdfbff;
+        }
+
+        .mesh-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-color: #ffffff;
+            background: 
+                radial-gradient(at 0% 0%, #e0e7ff 0px, transparent 50%),
+                radial-gradient(at 50% 0%, #f5f3ff 0px, transparent 50%),
+                radial-gradient(at 100% 0%, #fae8ff 0px, transparent 50%),
+                radial-gradient(at 0% 100%, #e0e7ff 0px, transparent 50%),
+                radial-gradient(at 50% 100%, #f5f3ff 0px, transparent 50%),
+                radial-gradient(at 100% 100%, #fae8ff 0px, transparent 50%);
+            filter: blur(100px);
+            animation: meshMove 20s infinite alternate;
+        }
+
+        @keyframes meshMove {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.1) translate(-2%, -2%); }
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        .btn-glossy {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-glossy::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.6s;
+        }
+
+        .btn-glossy:hover::before { left: 100%; }
+        .btn-glossy:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 20px 30px -10px rgba(99, 102, 241, 0.5);
+        }
+
+        .pulse-aura { animation: pulseAura 2s infinite; }
+        @keyframes pulseAura {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+
+        .levitate { animation: levitate 3s ease-in-out infinite; }
+        @keyframes levitate {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: revealUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        @keyframes revealUp { to { opacity: 1; transform: translateY(0); } }
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        #chat-widget-container {
+            position: fixed;
+            bottom: 100px;
+            right: 7px;
+            width: 90%;
+            max-width: 420px;
+            height: 85.5%;
+            scale: 0.95;
+            z-index: 1000;
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #chat-widget-container.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #1e293b 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .bento-card {
+            border-radius: 32px;
+            transition: all 0.3s ease;
+        }
+        .bento-card:hover { transform: scale(1.02); background: rgba(255, 255, 255, 0.9); }
+    </style>
+</head>
+<body>
+
+    <div class="mesh-gradient"></div>
+
+    <nav class="fixed top-0 left-0 right-0 z-50 px-4 md:px-6 py-4">
+        <div class="max-w-7xl mx-auto glass rounded-[2rem] px-4 md:px-8 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-4 group cursor-pointer">
+                <div class="relative w-12 h-12 flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-110">
+                    <img src="logo-fermi.png" 
+                         alt="Logo Liceo Fermi" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
+                         class="w-full h-full object-contain drop-shadow-md">
+                    <div class="hidden w-full h-full bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-xl items-center justify-center text-white font-black text-xl shadow-lg">
+                        F
+                    </div>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-extrabold text-slate-800 text-lg md:text-xl tracking-tight leading-none">FermiTi Ascolto</span>
+                    <span class="text-[10px] text-indigo-500 font-bold uppercase tracking-wider mt-1 hidden md:block">Spazio Digitale Safe</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center">
+                <span class="text-[10px] md:text-xs font-black text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full uppercase tracking-widest border border-indigo-100/50 shadow-sm">
+                    Liceo E. Fermi
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-32 pb-20 px-6">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="reveal inline-flex items-center gap-2 px-4 py-2 mb-8 glass rounded-full">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                </span>
+                <span class="text-xs font-bold text-indigo-600 uppercase tracking-widest">Sempre online per te</span>
+            </div>
+
+            <h1 class="reveal delay-1 text-5xl md:text-8xl font-extrabold mb-8 leading-[1.1] tracking-tight text-slate-900">
+                Non sei solo. <br>
+                <span class="text-gradient">Siamo qui per te.</span>
+            </h1>
+
+            <p class="reveal delay-2 text-lg md:text-xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed font-medium">
+                Uno spazio anonimo e gratuito progettato per gli studenti del Liceo Fermi. 
+                Sfogati, chiedi aiuto o parla con il nostro assistente digitale.
+            </p>
+            
+            <div class="reveal delay-3 flex flex-col sm:flex-row gap-6 justify-center items-center mb-24">
+                <button onclick="toggleChat()" class="btn-glossy pulse-aura px-10 py-5 text-white font-bold rounded-2xl text-lg flex items-center gap-2">
+                    <span>Inizia a parlare</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-left max-w-5xl mx-auto">
+                <div class="reveal delay-1 md:col-span-2 glass bento-card p-10 flex flex-col justify-between min-h-[240px]">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-3">100% Anonimo</h3>
+                        <p class="text-slate-500 font-medium">Privacy totale garantita per ogni studente.</p><br><br>
+                    </div>
+                </div>
+
+                <div class="reveal delay-2 md:col-span-2 glass bento-card p-10 flex flex-col justify-between min-h-[240px]">
+                    <div class="w-12 h-12 bg-pink-100 text-pink-600 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-3">Sempre Attivo</h3>
+                        <p class="text-slate-500 font-medium">Uno spazio anonimo e gratuito progettato per gli studenti del Liceo Fermi. 
+                Sfogati, chiedi aiuto o parla con il nostro assistente digitale.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div id="chat-toggle-btn" onclick="toggleChat()" class="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-2xl flex items-center justify-center cursor-pointer shadow-2xl z-[1001] transition-all hover:scale-110 active:scale-95 levitate">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+    </div>
+
+    <div id="chat-widget-container">
+        <div class="glass flex flex-col rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/50">
+            <div class="bg-gradient-to-r from-indigo-600 to-violet-600 p-6 flex justify-between items-center text-white">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center font-bold">F</div>
+                    <div>
+                        <h2 class="font-bold text-base leading-tight">FermiTi Ascolto</h2>
+                        <p class="text-[10px] opacity-80 uppercase tracking-widest font-bold">Online Ora</p>
+                    </div>
+                </div>
+                <button onclick="toggleChat()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10">&times;</button>
+            </div>
+            <div class="h-[500px] bg-white">
+                <iframe src="https://www.chatbase.co/chatbot-iframe/vebFla-TYyCDGGQflG3uU" width="100%" height="100%" frameborder="0"></iframe>
+            </div>
+            <div class="p-4 bg-red-50 text-center">
+                <p class="text-[10px] text-red-500 font-bold uppercase">Emergenze: 02 2327 2327 | 114</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleChat() {
+            const container = document.getElementById('chat-widget-container');
+            container.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energivora - Calcolatore</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+ 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Montserrat', sans-serif; line-height: 1.6; color: #fffdd0; background: linear-gradient(135deg, #40836d, #088f8f); overflow-x: hidden; }
+        p { text-align: justify; }
+ 
+        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.6s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+ 
+        /* HERO */
+        .hero { background: linear-gradient(135deg, #013220, #0F4C5C); color: #FFfdd0; padding: 50px 5%; position: relative; }
+        .hero-nav { display: flex; justify-content: center; align-items: center; width: 100%; max-width: 1200px; margin: 0 auto; position: relative; }
+        .hero-text { text-align: center; }
+        .hero-text h2 { font-size: 2.5rem; margin-bottom: 15px; line-height: 1.2; }
+        .hero-text strong { font-size: 1.1rem; color: #fffdd0; opacity: 0.9; }
+        .menu-btn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; width: 35px; height: 24.5px; z-index: 1000; transition: opacity 0.3s; }
+        .menu-btn.hidden { opacity: 0; pointer-events: none; }
+        .menu-btn span { display: block; height: 3px; width: 100%; background-color: #fffdd0; border-radius: 3px; }
+ 
+        /* SIDEBAR */
+        .sidebar-nav { position: fixed; top: 0; right: -300px; width: 300px; height: 100%; background: linear-gradient(135deg, #013220, #0F4C5C); padding: 30px 20px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1050; box-shadow: -5px 0 20px rgba(0,0,0,0.4); display: flex; flex-direction: column; }
+        .sidebar-nav.active { right: 0; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,200,87,0.2); }
+        .sidebar-header h2 { color: #FFfdd0; font-size: 1.1rem; letter-spacing: 2px; font-weight: bold; }
+        .close-btn { color: #f5f5dc; font-size: 3rem; cursor: pointer; line-height: 0.7; transition: 0.3s; }
+        .close-btn:hover { transform: rotate(90deg); color: #0F4C5C; }
+        .sidebar-menu { display: flex; flex-direction: column; gap: 15px; flex-grow: 1; }
+        .sidebar-nav a { padding: 15px 20px; text-decoration: none; font-size: 1rem; color: #FFfdd0; background: rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; font-weight: bold; border-radius: 12px; border: 1px solid rgba(255,111,97,0.2); }
+        .sidebar-nav a:hover { background: linear-gradient(135deg, #40836d, #088f8f); color: #f5f5dc; transform: translateX(-5px); }
+        .sidebar-tips { margin-top: auto; padding: 20px; border-radius: 15px; border: 1px dashed #FFfdd0; }
+        .sidebar-tips h4 { color: #FFfdd0; font-size: 1.1rem; margin-bottom: 10px; }
+        .sidebar-tips p { color: #FFF6F0; font-size: 0.87rem; margin-bottom: 5px; opacity: 0.8; word-break: break-all; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(1,50,32,0.7); z-index: 1040; }
+        .overlay.active { display: block; }
+ 
+        /* LAYOUT */
+        .container { width: 95%; max-width: 1200px; margin: 40px auto; }
+        .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: auto; gap: 18px; }
+        .bento-item { border-radius: 22px; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 6px 28px rgba(0,0,0,0.18); }
+ 
+        .c1 { background: #012a1a; border: 1px solid rgba(42,215,120,0.28); }
+        .c2 { background: #0d3b4f; border: 1px solid rgba(93,212,212,0.35); }
+        .c3 { background: #1c4730; border: 1px solid rgba(64,131,109,0.4); }
+ 
+        .col-5  { grid-column: span 5; }
+        .col-7  { grid-column: span 7; }
+        .col-12 { grid-column: span 12; }
+ 
+        .card-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; display: flex; align-items: center; gap: 6px; opacity: 0.65; color: #fffdd0; }
+        .card-label::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #2ad778; flex-shrink: 0; }
+        .c2 .card-label::before { background: #5dd4d4; }
+        .card-title { font-size: 1.08rem; font-weight: 700; line-height: 1.3; color: #fffdd0; }
+        .card-body  { font-size: 0.79rem; line-height: 1.7; color: rgba(255,253,208,0.82); }
+        .card-body strong { color: #fffdd0; font-weight: 700; }
+        .card-note  { font-size: 0.68rem; color: rgba(255,253,208,0.5); text-align: left; }
+ 
+        .sbox { border-radius: 11px; padding: 10px 12px; background: rgba(255,253,208,0.055); border: 1px solid rgba(255,253,208,0.09); }
+        .sbox .v { font-size: 1.2rem; font-weight: 900; line-height: 1; color: #2ad778; }
+        .c2 .sbox .v { color: #5dd4d4; }
+        .sbox .l { font-size: 0.62rem; font-weight: 600; opacity: 0.55; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+ 
+        .pill-row { display: flex; flex-wrap: wrap; gap: 6px; }
+        .pill { padding: 3px 10px; border-radius: 50px; font-size: 0.68rem; font-weight: 700; white-space: nowrap; background: rgba(255,253,208,0.08); color: #fffdd0; border: 1px solid rgba(255,253,208,0.16); }
+        .pill.green  { background: rgba(42,215,120,0.14); color: #2ad778; border-color: rgba(42,215,120,0.3); }
+        .pill.teal   { background: rgba(93,212,212,0.14); color: #5dd4d4; border-color: rgba(93,212,212,0.3); }
+ 
+        /* CATEGORIE */
+        .grid-categorie { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+        .colonna-ia { background: rgba(255,253,208,0.04); border: 1px solid rgba(255,253,208,0.09); border-radius: 12px; padding: 14px; }
+        .colonna-ia strong { display: block; font-size: 0.78rem; font-weight: 700; color: #fffdd0; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,253,208,0.1); }
+        .colonna-ia p { font-size: 0.75rem; color: rgba(255,253,208,0.7); margin-bottom: 3px; text-align: left; }
+ 
+        /* FORM */
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,253,208,0.55); }
+        select, input[type="number"], textarea { width: 100%; padding: 11px 14px; border: 1px solid rgba(255,253,208,0.12); border-radius: 10px; font-family: 'Montserrat', sans-serif; font-size: 0.82rem; background: rgba(255,253,208,0.055); color: #fffdd0; outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; }
+        select { background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232ad778' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-size: 13px; padding-right: 36px; cursor: pointer; }
+        select option { background: #012a1a; color: #fffdd0; }
+        select:focus, input:focus, textarea:focus { border-color: rgba(42,215,120,0.5); }
+        textarea { resize: none; min-height: 90px; line-height: 1.6; }
+        textarea::placeholder { color: rgba(255,253,208,0.3); }
+        input[type="number"] { -moz-appearance: textfield; }
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+ 
+        button { width: 100%; padding: 13px; background: linear-gradient(135deg, #40836d, #088f8f); color: #fffdd0; border: none; border-radius: 10px; cursor: pointer; font-size: 0.9rem; font-weight: 700; font-family: 'Montserrat', sans-serif; transition: 0.3s; letter-spacing: 0.5px; }
+        button:hover { background: linear-gradient(135deg, #013220, #0F4C5C); }
+ 
+        /* STEP LABELS */
+        .step-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(255,253,208,0.4); margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
+        .step-label span { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: rgba(42,215,120,0.15); border: 1px solid rgba(42,215,120,0.3); color: #2ad778; font-size: 0.6rem; font-weight: 900; }
+ 
+        /* RISULTATI PRINCIPALI */
+        #risultato { display: none; }
+        .res-numbers { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+        .res-item { border-radius: 11px; padding: 14px; background: rgba(255,253,208,0.055); border: 1px solid rgba(255,253,208,0.09); }
+        .res-item.full { grid-column: span 2; background: rgba(42,215,120,0.08); border-color: rgba(42,215,120,0.25); }
+        .res-item .v { font-size: 1.25rem; font-weight: 900; line-height: 1; color: #2ad778; }
+        .res-item.full .v { font-size: 1.7rem; }
+        .res-item .l { font-size: 0.6rem; font-weight: 600; opacity: 0.5; margin-top: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+ 
+        /* FUN FACTS GRID */
+        .funfacts-title { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(255,253,208,0.4); text-align: center; margin: 6px 0 2px; }
+        .funfacts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+ 
+        .ff-card {
+            border-radius: 12px;
+            padding: 12px 10px;
+            background: rgba(255,253,208,0.04);
+            border: 1px solid rgba(255,253,208,0.09);
+            text-align: center;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            animation: ffPop 0.4s ease-out both;
+        }
+        .ff-card:nth-child(1) { animation-delay: 0.00s; }
+        .ff-card:nth-child(2) { animation-delay: 0.06s; }
+        .ff-card:nth-child(3) { animation-delay: 0.12s; }
+        .ff-card:nth-child(4) { animation-delay: 0.18s; }
+        .ff-card:nth-child(5) { animation-delay: 0.24s; }
+        .ff-card:nth-child(6) { animation-delay: 0.30s; }
+        .ff-card:nth-child(7) { animation-delay: 0.36s; }
+        .ff-card:nth-child(8) { animation-delay: 0.42s; }
+ 
+        @keyframes ffPop {
+            from { opacity: 0; transform: scale(0.88) translateY(8px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+ 
+        .ff-icon  { font-size: 1.5rem; line-height: 1; }
+        .ff-value { font-size: 1rem; font-weight: 900; color: #2ad778; line-height: 1.1; }
+        .ff-label { font-size: 0.58rem; color: rgba(255,253,208,0.55); line-height: 1.25; text-transform: uppercase; letter-spacing: 0.04em; }
+ 
+        .input-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+        .input-pill { background: rgba(42,215,120,0.12); border: 1px solid rgba(42,215,120,0.28); color: #2ad778; padding: 2px 9px; border-radius: 50px; font-size: 0.62rem; font-weight: 700; }
+ 
+        @keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+ 
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .bento-grid { grid-template-columns: repeat(6,1fr); }
+            .col-5, .col-7 { grid-column: span 6; }
+            .col-12 { grid-column: span 6; }
+            .hero-text h2 { font-size: 1.8rem; }
+            .hero-nav { padding-right: 40px; }
+            .calc-cols { grid-template-columns: 1fr !important; }
+            .funfacts-grid { grid-template-columns: repeat(2,1fr); }
+        }
+        @media (max-width: 560px) {
+            .bento-grid { grid-template-columns: 1fr; }
+            .col-5, .col-7, .col-12 { grid-column: span 1; }
+            .funfacts-grid { grid-template-columns: repeat(2,1fr); }
+        }
+ 
+        footer { text-align: center; padding: 30px; background: linear-gradient(135deg, #013220, #0F4C5C); color: #FFfdd0; margin-top: 40px; }
+    </style>
+</head>
+<body>
+ 
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+<div class="sidebar-nav" id="sidebarNav">
+    <div class="sidebar-header">
+        <h2>&ensp;&ensp;&thinsp;Naviga per ⚡Energivora⚡</h2>
+        <div class="close-btn" onclick="toggleMenu()">&times;</div>
+    </div>
+    <div class="sidebar-menu">
+        <a href="../../index.html" onclick="toggleMenu()">Home <span>🏠</span></a>
+        <a href="../Energivora - Dati.html" onclick="toggleMenu()">Dati <span>📊</span></a>
+        <a href="Energivora - Sondaggio.html" onclick="toggleMenu()">Sondaggio <span>🕵</span></a>
+    </div>
+    <div class="sidebar-tips">
+        <h4>🌐 I nostri Contatti 🌐</h4>
+        <p>energivora.ia@gmail.com</p>
+        <p>lexius.cobio@gmail.com</p>
+        <p>pierluigisantagata@gmail.com</p>
+    </div>
+</div>
+ 
+<section class="hero">
+    <div class="hero-nav">
+        <div class="hero-text">
+            <h2>Calcolatore di Consumo Energetico</h2>
+            <strong>Dati aggiornati, statistiche e strumenti per gestire la tua esperienza con l'IA</strong>
+        </div>
+        <div class="menu-btn" id="menuBtn" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</section>
+ 
+<div class="container">
+<main class="bento-grid">
+ 
+    <!-- RIGA 1: 7+5=12 -->
+    <div class="bento-item c1 col-7 reveal">
+        <span class="card-label">Il Progetto</span>
+        <p class="card-title">Il nostro Prodotto</p>
+        <p class="card-body">Benvenuto su Energivora. Questo progetto nasce per offrire trasparenza e consapevolezza sull'energia elettrica utilizzata quotidianamente nell'ambito dell'Intelligenza Artificiale.</p>
+        <div class="sbox" style="border-left:3px solid #2ad778;">
+            <div class="l" style="margin-bottom:5px;">Trasparenza dei dati</div>
+            <p style="font-size:0.78rem;color:rgba(255,253,208,0.82);line-height:1.6;text-align:left;">I dati del calcolatore sono presi da nostre ricerche messe in un sito parallelo. Esso serve per calcolare il consumo creato dall'output in base al nostro input.</p>
+        </div>
+        <p class="card-title" style="font-size:0.95rem;margin-top:4px;">Perché usare questo calcolatore?</p>
+        <p class="card-body">Grazie alle analisi condotte sul nostro database dedicato, abbiamo strutturato questo strumento per permetterti di monitorare l'impatto economico dei tuoi movimenti.</p>
+        <p class="card-body">Conoscere il consumo di questi Chatbot è il primo passo per ottimizzare le spese mondiali e ridurre l'impatto che i data center hanno sull'ambiente.</p>
+        <div class="pill-row">
+            <span class="pill green">⚡ Consumo in tempo reale</span>
+            <span class="pill teal">🌍 Impatto ambientale</span>
+            <span class="pill">💸 Costo energetico</span>
+        </div>
+    </div>
+ 
+    <div class="bento-item c2 col-5 reveal">
+        <span class="card-label">Catalogo IA</span>
+        <p class="card-title">Categorie</p>
+        <p class="card-body" style="font-size:0.75rem;">Per facilitare la ricerca tra più di 20 opzioni, abbiamo diviso tutte le IA nei seguenti sottogruppi.</p>
+        <div class="grid-categorie">
+            <div class="colonna-ia">
+                <strong>💡 Assistenti & Ricerca</strong>
+                <p>AI Overview (Google)</p><p>ChatGPT (OpenAI)</p><p>Copilot (Microsoft)</p>
+                <p>DeepSeek</p><p>Gemini (Google)</p><p>Grok (xAI)</p><p>Perplexity</p>
+            </div>
+            <div class="colonna-ia">
+                <strong>🎨 Creatività & Design</strong>
+                <p>Canva</p><p>DALL-E 3</p><p>Gamma</p>
+                <p>Prezi</p><p>Sora AI</p><p>Stable Diffusion</p>
+            </div>
+            <div class="colonna-ia">
+                <strong>📚 Studio & Documenti</strong>
+                <p>Astra AI</p><p>Gauth</p><p>Notebooklm</p><p>Schoolgpt</p>
+            </div>
+            <div class="colonna-ia">
+                <strong>🍳 Singolari</strong>
+                <p>Agent (VS Code)</p><p>ChefG (GialloZafferano)</p><p>Claude (Anthropic)</p>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- RIGA 2: 12 -->
+    <div class="bento-item c3 col-12 reveal">
+        <span class="card-label">Strumento interattivo</span>
+        <p class="card-title">Calcola il tuo Impatto Energetico</p>
+ 
+        <div class="calc-cols" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;align-items:start;margin-top:4px;">
+ 
+            <!-- STEP 1 -->
+            <div style="display:flex;flex-direction:column;gap:14px;">
+                <div class="step-label"><span>1</span> Seleziona l'IA</div>
+                <div class="input-group">
+                    <label>Categoria IA</label>
+                    <select id="categoriaIA" onchange="mostraPassaggio('modello')">
+                        <option value="" disabled selected hidden>Scegli ambito...</option>
+                        <option value="ricerca">💡 Assistenti & Ricerca</option>
+                        <option value="design">🎨 Creatività & Design</option>
+                        <option value="studio">📚 Studio & Documenti</option>
+                        <option value="code">🍳 Singolari</option>
+                    </select>
+                </div>
+                <div class="input-group" id="box-modello" style="display:none;">
+                    <label>Quale IA usi?</label>
+                    <select id="tipoIA" onchange="mostraPassaggio('output')"></select>
+                </div>
+                <div class="input-group" id="box-output" style="display:none;">
+                    <label>Cosa vuoi generare?</label>
+                    <select id="tipoOutput" onchange="mostraPassaggio('input')">
+                        <option value="" disabled selected hidden>Scegli...</option>
+                        <option value="testo">Testo (Prompt)</option>
+                        <option value="immagine">Immagine</option>
+                        <option value="video">Video</option>
+                    </select>
+                </div>
+            </div>
+ 
+            <!-- STEP 2 -->
+            <div id="box-dati-input" style="display:none;flex-direction:column;gap:14px;">
+                <div class="step-label"><span>2</span> Inserisci i dati</div>
+                <div class="input-group">
+                    <label id="labelInput">Input</label>
+                    <textarea id="valoreInput" placeholder="Scrivi qui..." oninput="verificaSblocco()"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Hai allegato file o foto?</label>
+                    <select id="sceltaFile" onchange="gestisciFile()">
+                        <option value="no">No</option>
+                        <option value="si">Sì (File o Foto)</option>
+                    </select>
+                </div>
+                <div class="input-group" id="box-file" style="display:none;">
+                    <label>Quanti file/foto?</label>
+                    <input type="number" id="numFile" value="0" min="1" oninput="verificaSblocco()">
+                </div>
+                <button id="btnCalcola" onclick="calcola()" style="display:none;margin-top:4px;">Calcola Impatto ▶</button>
+            </div>
+ 
+            <!-- STEP 3 -->
+            <div id="risultato" style="display:none;flex-direction:column;gap:10px;">
+                <div class="step-label"><span>3</span> Risultati</div>
+                <div class="res-numbers">
+                    <div class="res-item full">
+                        <div class="v" id="resWh">—</div>
+                        <div class="l">Energia Consumata (Wh)</div>
+                    </div>
+                    <div class="res-item">
+                        <div class="v" id="resEuroUtente">—</div>
+                        <div class="l">Costo Utente (€)</div>
+                    </div>
+                    <div class="res-item">
+                        <div class="v" id="resEuroAzienda">—</div>
+                        <div class="l">Costo Data Center (€)</div>
+                    </div>
+                </div>
+                <div class="input-pills" id="inputPills"></div>
+            </div>
+        </div>
+ 
+        <!-- FUN FACTS — larghezza piena sotto i 3 step -->
+        <div id="funfacts-section" style="display:none;flex-direction:column;gap:10px;margin-top:8px;border-top:1px solid rgba(255,253,208,0.08);padding-top:14px;">
+            <p class="funfacts-title">— equivalenze curiose (cambiano ad ogni calcolo) —</p>
+            <div class="funfacts-grid" id="funfacts-grid"></div>
+        </div>
+ 
+    </div>
+ 
+</main>
+</div>
+ 
+<footer><strong>Cobio Alessio & Santagata Pierluigi</strong></footer>
+ 
+<script>
+const categorie = {
+    'ricerca': [{val:'ai-overview',nome:'AI Overview (Google)'},{val:'chatgpt',nome:'ChatGPT (OpenAI)'},{val:'copilot',nome:'Copilot (Microsoft)'},{val:'deepseek',nome:'DeepSeek'},{val:'gemini',nome:'Gemini (Google)'},{val:'grok',nome:'Grok (xAI)'},{val:'perplexity',nome:'Perplexity'}],
+    'design':  [{val:'canva',nome:'Canva'},{val:'dalle3',nome:'DALL-E 3'},{val:'gamma',nome:'Gamma'},{val:'prezi',nome:'Prezi'},{val:'sora',nome:'Sora AI'},{val:'stablediffusion',nome:'Stable Diffusion'}],
+    'studio':  [{val:'astra',nome:'Astra AI'},{val:'gauth',nome:'Gauth'},{val:'notebooklm',nome:'NotebookLM'},{val:'schoolgpt',nome:'SchoolGPT'}],
+    'code':    [{val:'agent',nome:'Agent (VS Code)'},{val:'chefg',nome:'ChefG (GialloZafferano)'},{val:'claude',nome:'Claude (Anthropic)'}]
+};
+ 
+const databaseIA = {
+    'ai-overview':{wh:0.58,t:true,i:false,v:false},'chatgpt':{wh:0.34,t:true,i:true,v:false},
+    'claude':{wh:0.40,t:true,i:false,v:false},'copilot':{wh:0.38,t:true,i:true,v:true},
+    'deepseek':{wh:0.28,t:true,i:false,v:false},'gemini':{wh:0.24,t:true,i:true,v:true},
+    'grok':{wh:0.52,t:true,i:true,v:true},'perplexity':{wh:0.65,t:true,i:true,v:true},
+    'canva':{wh:2.20,t:true,i:true,v:true},'dalle3':{wh:1.10,t:false,i:true,v:false},
+    'gamma':{wh:0.85,t:true,i:true,v:true},'prezi':{wh:0.45,t:true,i:true,v:true},
+    'sora':{wh:125.0,t:false,i:true,v:true},'stablediffusion':{wh:2.50,t:false,i:true,v:true},
+    'gauth':{wh:0.20,t:true,i:false,v:false},'notebooklm':{wh:0.55,t:true,i:true,v:true},
+    'schoolgpt':{wh:0.15,t:true,i:false,v:false},'agent':{wh:0.22,t:true,i:false,v:false},
+    'astra':{wh:0.30,t:true,i:false,v:false},'chefg':{wh:0.18,t:true,i:false,v:false}
+};
+ 
+// Libreria fun facts — funzione che riceve il totale Wh e restituisce valore+label+icona
+const funFactsLib = [
+    { icon:'📱', fn: wh => ({ v: (wh/22).toFixed(1),           l: 'Ricariche smartphone' }) },
+    { icon:'💡', fn: wh => ({ v: (wh/10).toFixed(1)+'h',       l: 'Lampadina LED accesa' }) },
+    { icon:'☁️', fn: wh => ({ v: (wh/1000*300).toFixed(1)+'g', l: 'CO₂ emessa' }) },
+    { icon:'💧', fn: wh => ({ v: (wh*1.5).toFixed(1)+'cl',     l: 'Acqua nei server' }) },
+    { icon:'🌳', fn: wh => ({ v: (wh/1000*0.05).toFixed(4),    l: 'Alberi necessari per assorbire la CO₂ in un anno' }) },
+    { icon:'🚗', fn: wh => ({ v: (wh/1000/0.2).toFixed(2)+'m', l: 'Km percorsi da un\'auto elettrica' }) },
+    { icon:'🔥', fn: wh => ({ v: (wh*3.6).toFixed(1)+'kJ',     l: 'Energia termica equivalente' }) },
+    { icon:'🍕', fn: wh => ({ v: (wh/250).toFixed(3),          l: 'Pizze cotte nel forno' }) },
+    { icon:'🌊', fn: wh => ({ v: (wh/1000*1.8).toFixed(4)+'°C',l: 'Riscaldamento di 1L d\'acqua' }) },
+    { icon:'📺', fn: wh => ({ v: (wh/100).toFixed(2)+'h',      l: 'TV da 100W accesa' }) },
+    { icon:'🧺', fn: wh => ({ v: (wh/500).toFixed(3),          l: 'Lavaggi lavatrice a 60°' }) },
+    { icon:'❄️', fn: wh => ({ v: (wh/150).toFixed(2)+'h',      l: 'Frigorifero in funzione' }) },
+    { icon:'☀️', fn: wh => ({ v: (wh/200).toFixed(3)+'h',      l: 'Pannello solare per produrla' }) },
+    { icon:'🎮', fn: wh => ({ v: (wh/150).toFixed(2)+'h',      l: 'Console da gioco accesa' }) },
+    { icon:'🌱', fn: wh => ({ v: (wh/1000*8).toFixed(3),       l: 'mq di foresta per compensare la CO₂ in un giorno' }) },
+    { icon:'🧏', fn: wh => ({ v: (wh * 0.8604).toFixed(2),     l: 'Kcal (Calorie medie giornaliere)' }) },
+    { icon:'💻', fn: wh => ({ v: (wh/30).toFixed(2)+'h',       l: 'Laptop da 30W acceso' }) },
+    { icon:'🌺', fn: wh => ({ v: Math.round(wh*5),             l: 'Fiori che sbocciano (energia fotosintesi equiv.)' }) },
+    { icon:'🧊', fn: wh => ({ v: (wh/335*1000).toFixed(2)+'g', l: 'Ghiaccio che si scioglie' }) },
+    { icon:'🌍', fn: wh => ({ v: (wh/1000/510e12*1e18).toFixed(6)+'nJ/m²', l: 'Energia solare sulla Terra ogni secondo' }) },
+    { icon:'🕯️', fn: wh => ({ v: (wh/0.075).toFixed(1)+'h',   l: 'Candela accesa' }) },
+    { icon:'🌀', fn: wh => ({ v: (wh/3.6).toFixed(3)+'kJ',     l: 'Energia cinetica equiv. di un tornado piccolo' }) },
+    { icon:'🍃', fn: wh => ({ v: (wh/1000*300/0.022).toFixed(1), l: 'Foglie che assorbono la CO₂ prodotta' }) },
+];
+ 
+function shuffle(arr) {
+    const a = [...arr];
+    for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+}
+ 
+function mostraPassaggio(step) {
+    if(step==='modello'){
+        const cat=document.getElementById('categoriaIA').value;
+        const sel=document.getElementById('tipoIA');
+        sel.innerHTML='<option value="" disabled selected hidden>Scegli il modello...</option>';
+        categorie[cat].forEach(ia=>sel.add(new Option(ia.nome,ia.val)));
+        resetFinoA('box-modello');
+    } else if(step==='output'){
+        const cap=databaseIA[document.getElementById('tipoIA').value];
+        const out=document.getElementById('tipoOutput');
+        [...out.options].forEach((opt,i)=>{ if(i>0) opt.style.display=[cap.t,cap.i,cap.v][i-1]?'block':'none'; });
+        resetFinoA('box-output');
+        const valide=[cap.t,cap.i,cap.v].filter(Boolean);
+        if(valide.length===1){ out.value=cap.t?'testo':cap.i?'immagine':'video'; mostraPassaggio('input'); }
+    } else if(step==='input'){
+        const out=document.getElementById('tipoOutput').value;
+        document.getElementById('labelInput').innerText=out==='testo'?"Inserisci il tuo Prompt":"Descrizione (opzionale se carichi foto)";
+        const el=document.getElementById('box-dati-input');
+        el.style.display='flex'; el.style.animation='none'; el.offsetHeight; el.style.animation='slideDown 0.35s ease-out forwards';
+        ['box-file','btnCalcola','risultato','funfacts-section'].forEach(id=>{ document.getElementById(id).style.display='none'; });
+        setTimeout(()=>document.getElementById('valoreInput').focus(),300);
+    }
+}
+ 
+function resetFinoA(id) {
+    const ids=['box-modello','box-output','box-dati-input','box-file','btnCalcola','risultato','funfacts-section'];
+    let start=false;
+    const target=document.getElementById(id);
+    target.style.display='block';
+    target.style.animation='none'; target.offsetHeight; target.style.animation='slideDown 0.35s ease-out forwards';
+    ids.forEach(boxId=>{
+        if(start){ const el=document.getElementById(boxId); el.style.display='none'; el.style.animation='none'; }
+        if(boxId===id) start=true;
+    });
+}
+ 
+function gestisciFile() {
+    const si=document.getElementById('sceltaFile').value==='si';
+    const boxFile=document.getElementById('box-file');
+    if(si){ boxFile.style.display='block'; boxFile.style.animation='slideDown 0.35s ease-out forwards'; }
+    else { boxFile.style.display='none'; document.getElementById('numFile').value=0; }
+    verificaSblocco();
+}
+ 
+function verificaSblocco() {
+    const haTesto=document.getElementById('valoreInput').value.trim().length>0;
+    const haFile=document.getElementById('sceltaFile').value==='si'&&document.getElementById('numFile').value>0;
+    const btn=document.getElementById('btnCalcola');
+    if(haTesto||haFile){ if(btn.style.display!=='block'){ btn.style.display='block'; btn.style.animation='slideDown 0.35s ease-out forwards'; } }
+    else { btn.style.display='none'; }
+}
+ 
+function calcola() {
+    const idIA=document.getElementById('tipoIA').value;
+    const out=document.getElementById('tipoOutput').value;
+    const txt=document.getElementById('valoreInput').value;
+    const nF=parseInt(document.getElementById('numFile').value)||0;
+    const dati=databaseIA[idIA];
+ 
+    const mult=Math.max(1,(txt.length/500)+(nF*0.8));
+    let wh=out==='video'?115:out==='immagine'?Math.max(dati.wh,1.9):dati.wh;
+    const totaleWh=wh*mult;
+    const kwh=totaleWh/1000;
+ 
+    // Risultati principali
+    document.getElementById('resWh').innerText=totaleWh.toFixed(3);
+    document.getElementById('resEuroUtente').innerText=(kwh*0.25).toFixed(5);
+    document.getElementById('resEuroAzienda').innerText=(kwh*1.68).toFixed(5);
+ 
+    let pills='';
+    if(nF>0) pills+=`<span class="input-pill">📁 ${nF} file</span>`;
+    if(txt.length) pills+=`<span class="input-pill">✍️ ${txt.length} car.</span>`;
+    document.getElementById('inputPills').innerHTML=pills;
+ 
+    const res=document.getElementById('risultato');
+    res.style.display='flex'; res.style.animation='none'; res.offsetHeight; res.style.animation='slideDown 0.4s ease-out forwards';
+ 
+    // Fun facts casuali — scelti 8 dalla libreria
+    const scelti=shuffle(funFactsLib).slice(0,8);
+    const grid=document.getElementById('funfacts-grid');
+    grid.innerHTML=scelti.map(ff=>{
+        const {v,l}=ff.fn(totaleWh);
+        return `<div class="ff-card">
+            <span class="ff-icon">${ff.icon}</span>
+            <span class="ff-value">${v}</span>
+            <span class="ff-label">${l}</span>
+        </div>`;
+    }).join('');
+ 
+    const sec=document.getElementById('funfacts-section');
+    sec.style.display='flex'; sec.style.animation='none'; sec.offsetHeight; sec.style.animation='slideDown 0.5s ease-out forwards';
+}
+ 
+function toggleMenu() {
+    document.getElementById('sidebarNav').classList.toggle('active');
+    document.getElementById('overlay').classList.toggle('active');
+    document.getElementById('menuBtn').classList.toggle('hidden');
+}
+ 
+const observer=new IntersectionObserver(
+    entries=>entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('active'); }),
+    {threshold:0.1}
+);
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>
